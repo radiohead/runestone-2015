@@ -1,11 +1,14 @@
 package se.uu.it.runestone.teamone.pathfinding;
 
-import java.util.Comparator;
-import java.util.PriorityQueue;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 
-import se.uu.it.runestone.teamone.pathfinding.graph;
+import se.uu.it.runestone.teamone.pathfinding.frontier.PrioritySupplier;
+import se.uu.it.runestone.teamone.pathfinding.frontier.RequirementChecker;
+import se.uu.it.runestone.teamone.pathfinding.frontier.FrontierNode;
+import se.uu.it.runestone.teamone.pathfinding.frontier.FrontierNodeComparator;
+
 
 /**
  * A class that implements pathfinding algorithms.
@@ -14,13 +17,13 @@ import se.uu.it.runestone.teamone.pathfinding.graph;
  */
 public class PathFinder {
   /// A FrontierNode comparator that compares nodes on priority.
-  private PathFinder.FrontierNodeComparator frontierComparator;
+  private FrontierNodeComparator frontierComparator;
 
   /**
    * The designated initializer.
    */
   public PathFinder() {
-    this.frontierComparator = new PathFinder.FrontierNodeComparator();
+    this.frontierComparator = new FrontierNodeComparator();
   }
 
   /**
@@ -34,19 +37,19 @@ public class PathFinder {
    *
    * @return The shortest path from start to target.
    */
-  public ArrayList<PathFindingNode> shortestPath(PathFindingNode from, PathFindingNode goal, PathFindingGraph graph) {
+  public ArrayList<PathFindingNode> shortestPath(final PathFindingNode from, final PathFindingNode goal, final PathFindingGraph graph) {
     RequirementChecker requirementChecker = new RequirementChecker() {
       public Boolean nodeMeetsRequirements(PathFindingNode node) {
         return node == goal;
       }
-    }
+    };
     PrioritySupplier prioritySupplier = new PrioritySupplier() {
       public int priority(int cost, PathFindingNode node) {
-        return cost + graph.distance(goal, neighbour);
+        return cost + graph.distance(goal, node);
       }
-    }
+    };
 
-    this.shortestPathWithPriorityAndRequirementFunction(from, graph, requirementChecker, prioritySupplier);
+    return this.shortestPathWithPriorityAndRequirementFunction(from, graph, requirementChecker, prioritySupplier);
   }
 
   /**
@@ -61,52 +64,22 @@ public class PathFinder {
    *
    * @return The shortest path from start to a suitable target.
    */
-  public ArrayList<PathFindingNode> shortestPathToNodeMatchingRequirements(PathFindingNode from, PathfindingRequirements requirements, PathFindingGraph graph) {
-    {
+  public ArrayList<PathFindingNode> shortestPathToNodeMatchingRequirements(final PathFindingNode from, final PathFindingRequirements requirements, final PathFindingGraph graph) {
     RequirementChecker requirementChecker = new RequirementChecker() {
       public Boolean nodeMeetsRequirements(PathFindingNode node) {
-        return graph.nodeMeetsRequirements(requirements);
+        return graph.nodeMeetsRequirements(node, requirements);
       }
-    }
+    };
     PrioritySupplier prioritySupplier = new PrioritySupplier() {
       public int priority(int cost, PathFindingNode node) {
         return cost;
       }
-    }
+    };
 
-    this.shortestPathWithPriorityAndRequirementFunction(from, graph, requirementChecker, prioritySupplier);
+    return this.shortestPathWithPriorityAndRequirementFunction(from, graph, requirementChecker, prioritySupplier);
   }
 
   ///////// PRIVATE /////////
-
-  /**
-   * An object checking wether the current node meets requirements.
-   */
-  private interface RequirementChecker {
-    /**
-     * Wether the node meets end requirements or not.
-     *
-     * @param node The node to check requirements against.
-     *
-     * @return A boolean stating whether or not the node meets the requirements or not.
-     */
-    public Boolean nodeMeetsRequirements(PathFindingNode node);
-  }
-
-  /**
-   * An object supplying priorities for frontier nodes.
-   */
-  private interface PrioritySupplier {
-    /**
-     * Supplies a priority for the frontier node.
-     *
-     * @param cost The cost of navigating to the node from the start node.
-     * @param node The node to calculate priority for.
-     *
-     * @param An integer representing the priority of this frontier node compared to others.
-     */
-    public int priority(int cost, PathFindingNode node);
-  }
 
   /**
    * Calculates the shortest path from a node to any node meeting the requirements.
@@ -131,14 +104,15 @@ public class PathFinder {
     frontier.add(start);
 
     HashMap<PathFindingNode,PathFindingNode> links = new HashMap<PathFindingNode,PathFindingNode>();
-    links.put(form) = null;
-    HashMap<PathFindingNode,int> costs = new HashMap<PathFindingNode,int>();
-    costs.put(from) = 0;
+    links.put(from, null);
+    HashMap<PathFindingNode,Integer> costs = new HashMap<PathFindingNode,Integer>();
+    costs.put(from, 0);
 
-    while ((FrontierNode currentFrontier = frontier.poll()) != null) {
+    FrontierNode currentFrontier;
+    while ((currentFrontier = frontier.poll()) != null) {
       PathFindingNode current = currentFrontier.node;
 
-      if (requirementChecker.nodeMeetsRequirements(current))
+      if (requirementChecker.nodeMeetsRequirements(current)) {
         break;
       }
 
@@ -151,7 +125,7 @@ public class PathFinder {
         }
 
         int cost = costs.get(current) + stepCost;
-        if (!costs.containsKey(neighbour) || cost < costs.get(current)) {
+        if (!costs.containsKey(neighbour) || cost < costs.get(current)) {
           costs.put(neighbour, cost);
           int priority = prioritySupplier.priority(cost, neighbour);
           FrontierNode next = new FrontierNode(neighbour, priority);
@@ -161,7 +135,11 @@ public class PathFinder {
       }
     }
 
-    return this.constructPath(from, currentFrontier.node, links);
+    if (currentFrontier == null) {
+      return null;
+    } else {
+      return this.constructPath(from, currentFrontier.node, links);
+    }
   }
 
   /**
@@ -173,7 +151,7 @@ public class PathFinder {
    *
    * @return An array list with nodes in the order of the path.
    */
-  private ArrayList<PathFindingNode> constructPath(PathFindingNode from, PathFindingNode goal, HashMap<PathFindingNode> links) {
+  private ArrayList<PathFindingNode> constructPath(PathFindingNode from, PathFindingNode goal, HashMap<PathFindingNode, PathFindingNode> links) {
     PathFindingNode current = goal;
     ArrayList<PathFindingNode> path = new ArrayList<PathFindingNode>();
     path.add(current);
@@ -184,36 +162,5 @@ public class PathFinder {
     }
 
     return path;
-  }
-
-  //////// FRONTIER NODES ////////
-
-  /**
-   * A node in the frontier including a PathFindingNode and a priority.
-   */
-  private static class FrontierNode implements Comparable<FrontierNode> {
-    public final PathFindingNode node;
-    public final int priority;
-
-    /**
-     * The designated initializer. Creates a new FrontierNode with a given node and a priority.
-     *
-     * @param node      The node that is part of the frontier.
-     * @param priority  The priorty this node has compared to others in the frontier.
-     */
-    public FrontierNode(PathFindingNode node, int priority) {
-      this.node = node;
-      this.priority = priority;
-    }
-  }
-
-  /**
-   * Compares two FrontierNode objects based on their priority.
-   */
-  private static class FrontierNodeComparator implements Comparator<FrontierNode> {
-    @Override
-    public int compare(FrontierNode node, FrontierNode other) {
-      return Integer.valueOf(node.priority).compareTo(other.priority);
-    }
   }
 }
