@@ -14,7 +14,7 @@ public interface PathFindingGraph {
      *
      * @return A list of neighbouring nodes. The list is empty if no neighbours exists.
      */
-    public ArrayList<PathFindingNode> neighbours(PathFindingNode node);
+    ArrayList<PathFindingNode> neighbours(PathFindingNode node);
 
     /**
      * Returns the cost of moving from a node to its neighbour.
@@ -26,7 +26,7 @@ public interface PathFindingGraph {
      *
      * @return An integer representing the cost of the movement. -1 if the movement cannot take place.
      */
-    public int cost(PathFindingNode node, PathFindingNode neighbour);
+    Integer cost(PathFindingNode node, PathFindingNode neighbour);
 
     /**
      * Returns the manhattan distance from node a to node b.
@@ -36,7 +36,7 @@ public interface PathFindingGraph {
      *
      * @return The manhattan distance as an integer.
      */
-    public int distance(PathFindingNode a, PathFindingNode b);
+    Integer distance(PathFindingNode a, PathFindingNode b);
 
     /**
      * Whether or not the given node meets the reqirements for an end node.
@@ -46,6 +46,13 @@ public interface PathFindingGraph {
      *
      * @return A boolean stating whether the node meeds the requirements.
      */
-    public Boolean nodeMeetsRequirements(PathFindingNode node, PathFindingRequirements requirements);
+    Boolean nodeMeetsRequirements(PathFindingNode node, PathFindingRequirements requirements);
+
+    /**
+     * Notifies the map that the node has been visited by the pathfinder. Mostly used for logging.
+     *
+     * @param node The node that was visited.
+     */
+    void didVisitNode(PathFindingNode node);
 }
 

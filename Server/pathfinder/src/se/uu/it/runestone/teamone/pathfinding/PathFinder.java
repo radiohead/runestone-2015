@@ -3,6 +3,7 @@ package se.uu.it.runestone.teamone.pathfinding;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
+import java.util.logging.Level;
 
 import se.uu.it.runestone.teamone.pathfinding.frontier.PrioritySupplier;
 import se.uu.it.runestone.teamone.pathfinding.frontier.RequirementChecker;
@@ -40,7 +41,7 @@ public class PathFinder {
   public ArrayList<PathFindingNode> shortestPath(final PathFindingNode from, final PathFindingNode goal, final PathFindingGraph graph) {
     RequirementChecker requirementChecker = new RequirementChecker() {
       public Boolean nodeMeetsRequirements(PathFindingNode node) {
-        return node == goal;
+        return node.equals(goal);
       }
     };
     PrioritySupplier prioritySupplier = new PrioritySupplier() {
@@ -105,12 +106,14 @@ public class PathFinder {
 
     HashMap<PathFindingNode,PathFindingNode> links = new HashMap<PathFindingNode,PathFindingNode>();
     links.put(from, null);
+
     HashMap<PathFindingNode,Integer> costs = new HashMap<PathFindingNode,Integer>();
     costs.put(from, 0);
 
     FrontierNode currentFrontier;
     while ((currentFrontier = frontier.poll()) != null) {
       PathFindingNode current = currentFrontier.node;
+      graph.didVisitNode(current);
 
       if (requirementChecker.nodeMeetsRequirements(current)) {
         break;
