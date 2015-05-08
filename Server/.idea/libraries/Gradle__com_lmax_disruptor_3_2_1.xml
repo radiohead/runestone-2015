@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.lmax:disruptor:3.2.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.lmax/disruptor/3.2.1/db375f499e32c3f06549e9addf8b1647123d6426/disruptor-3.2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.lmax/disruptor/3.2.1/ecb48bda0a8b71b80293127e2f787cbf46adb9b4/disruptor-3.2.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

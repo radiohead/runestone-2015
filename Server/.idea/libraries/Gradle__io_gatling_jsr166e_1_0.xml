@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.gatling:jsr166e:1.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.gatling/jsr166e/1.0/d1bf191a18dfe6e3157a4fbf6b527390d906ace6/jsr166e-1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.gatling/jsr166e/1.0/e18eb2f469a697638b86e473f52987b849a1c6e0/jsr166e-1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
