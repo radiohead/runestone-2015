@@ -3,7 +3,6 @@ package se.uu.it.runestone.teamone.pathfinding;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
-import java.util.logging.Level;
 
 import se.uu.it.runestone.teamone.pathfinding.frontier.PrioritySupplier;
 import se.uu.it.runestone.teamone.pathfinding.frontier.RequirementChecker;

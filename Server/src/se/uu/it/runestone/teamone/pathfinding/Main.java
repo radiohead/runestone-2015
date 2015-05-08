@@ -9,7 +9,7 @@ public class Main {
         PathFinder pathfinder = new PathFinder();
 
         PathFindingNode start = map.nodeFromCoordinates(0, 9);
-        PathFindingNode goal = map.nodeFromCoordinates(9, 0);
+        PathFindingNode goal = map.nodeFromCoordinates(9, 9);
 
         // Shortest path from A to B
         ArrayList<PathFindingNode> path = pathfinder.shortestPath(start, goal, map);
@@ -94,7 +94,7 @@ class Map implements PathFindingGraph {
     @Override
     public void didVisitNode(PathFindingNode node) {
         ((Node)node).visited = true;
-        System.out.println(this);
+        //System.out.println(this);
     }
 
     //// Printing ////
@@ -150,7 +150,7 @@ class Map implements PathFindingGraph {
         }
 
         for (Integer y = 0; y < this.height; y++) {
-            if (y != 8) {
+            if (y != 7) {
                 Node node = (Node)this.nodeFromCoordinates(7, y);
                 node.obstructed = true;
             }
