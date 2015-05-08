@@ -19,7 +19,7 @@ repositories {
     mavenCentral()
 }
 
-mainClassName = "se.uu.it.runestone.teamone.webservice.Application"
+mainClassName = "se.uu.it.runestone.teamone.Application"
 
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web'
