@@ -8,11 +8,12 @@ import se.uu.it.runestone.teamone.pathfinding.*;
  * @author Daniel Eliassen
  */
 public class Node implements PathFindingNode{
-	private int x=-1,y=-1;
-	private int stored=0;
-	private double temp=-1;
-	private double light=-1;
-	private Sensor sensor=null;
+	private int x = -1, y = -1;
+	private int stored = 0;
+	private double temp = -1;
+	private double light = -1;
+	private double humidity = -1;
+	private Sensor sensor = null;
 	
 	
 	public Node (int x, int y, Sensor sensor) throws IllegalArgumentException{
@@ -30,13 +31,14 @@ public class Node implements PathFindingNode{
 	public int getY(){
 		return this.y;
 	}
-	public boolean equalsTo(Node otherPosition){
+	public Boolean equalsTo(Node otherPosition){
 		if(otherPosition.getX() == this.getX() && otherPosition.getY() == this.getY()){
 		return true;
 		} else {
 		return false;
 		}
 	}
+
 	public int getItemsStored() {
 		return stored;
 	}
@@ -60,5 +62,16 @@ public class Node implements PathFindingNode{
 	}
 	private void setSensor(Sensor sensor) {
 		this.sensor = sensor;
+	}
+	public void update(double humidity, double light, double temperature) {
+		this.setHumidity(humidity);
+		this.setLight(light);
+		this.setTemp(temperature);
+	}
+	public double getHumidity() {
+		return humidity;
+	}
+	private void setHumidity(double humidity) {
+		this.humidity = humidity;
 	}
 }
