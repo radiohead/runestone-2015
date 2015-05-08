@@ -1,4 +1,4 @@
-package se.uu.it.runestone.teamone.webservice;
+package main.java.se.uu.it.runestone.teamone;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
