@@ -41,10 +41,10 @@ public class Room extends Thread implements PathFindingGraph {
 	}
 
 	public int getDimY() {
-		return this.dimY;
+		return dimY;
 	}
 	public int getDimX() {
-		return this.dimX;
+		return dimX;
 	}
 
 

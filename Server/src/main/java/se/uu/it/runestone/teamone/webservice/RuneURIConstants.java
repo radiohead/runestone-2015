@@ -8,7 +8,7 @@ public class RuneURIConstants {
     public static final String CREATE_ROB = "/rest/robot/create";
     public static final String DELETE_ROB = "/rest/robot/delete/{id}";
 
-    public static final String DUMMY_MAP ="/rest/map/dummy";
-    public static final String GET_MAP = "/rest/map/{id}";
-    public static final String GET_ALL_MAP = "/rest/maps";
+    public static final String DUMMY_ROOM ="/rest/room/dummy";
+    public static final String GET_ROOM = "/rest/room/{id}";
+    public static final String GET_ALL_ROOM = "/rest/rooms";
 }

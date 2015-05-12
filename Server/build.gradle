@@ -19,6 +19,15 @@ repositories {
     mavenCentral()
 }
 
+/*sourceSets {
+    main {
+        java {
+            srcDir 'src'
+            exclude '
+        }
+  }
+}*/
+
 mainClassName = "se.uu.it.runestone.teamone.Application"
 
 dependencies {
