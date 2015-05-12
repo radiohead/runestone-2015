@@ -2,10 +2,12 @@ package se.uu.it.runestone.teamone.pathfinding;
 
 import java.util.ArrayList;
 
+import se.uu.it.runestone.teamone.map.Room;
+
 public class Main {
     public static void main(String[] args) {
 
-        Map map = new Map(10,10);
+        Room map = new Room(10,10);
         PathFinder pathfinder = new PathFinder();
 
         PathFindingNode start = map.nodeFromCoordinates(0, 9);
@@ -21,7 +23,7 @@ public class Main {
     }
 }
 
-
+/*
 class Map implements PathFindingGraph {
 
     private Integer width;
@@ -197,4 +199,4 @@ class Node implements PathFindingNode {
             return "   ";
         }
     }
-}
+}*/
