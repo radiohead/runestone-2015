@@ -58,5 +58,6 @@
     <orderEntry type="library" exported="" name="Gradle: io.gatling:jsr166e:1.0" level="project" />
     <orderEntry type="library" exported="" name="Gradle: com.goldmansachs:gs-collections-api:5.1.0" level="project" />
     <orderEntry type="library" exported="" name="Gradle: commons-logging:commons-logging:1.2" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: org.rxtx:rxtx:2.1.7" level="project" />
   </component>
 </module>
