@@ -1,77 +1,71 @@
 package se.uu.it.runestone.teamone.map;
-import se.uu.it.runestone.teamone.climate.Sensor;
 import se.uu.it.runestone.teamone.pathfinding.*;
+
+import java.util.ArrayList;
 
 /**
  * A class implementing representation of coordinate in the Map.
  * 
  * @author Daniel Eliassen
  */
+
 public class Node implements PathFindingNode{
 	private int x = -1, y = -1;
-	private int stored = 0;
-	private double temp = -1;
-	private double light = -1;
-	private double humidity = -1;
-	private Sensor sensor = null;
+	private Boolean visited;
+	private Boolean obstructed;
+
+    public double temp = -1;
+    public double light = -1;
+    public double humidity = -1;
 	
-	
-	public Node (int x, int y, Sensor sensor) throws IllegalArgumentException{
-		if(x>=0 && y>=0){
+	public Node (int x, int y, Boolean obstructed) {
 			this.x = x;
 			this.y = y;
-			this.setSensor(sensor);
-		}else{
-			throw new IllegalArgumentException();
-			}
+            this.setObstructed(obstructed);
+            this.setVisited(false);
 		}
-	public int getX(){
+	@Override public Integer getX(){
 		return this.x;
 	}
-	public int getY(){
-		return this.y;
+	@Override public Integer getY() { return this.y; }
+
+	public Boolean equals(PathFindingNode otherPosition){
+		return (otherPosition.getX() == this.getX() && otherPosition.getY() == this.getY());
 	}
-	public Boolean equalsTo(Node otherPosition){
-		if(otherPosition.getX() == this.getX() && otherPosition.getY() == this.getY()){
-		return true;
-		} else {
-		return false;
-		}
+    @Override public Boolean getVisited(){
+		return this.visited;
+	}
+    @Override public Boolean getObstructed(){
+		return this.obstructed;
+	}
+    public void setVisited(Boolean bool){
+        this.visited = bool;
+    }
+    public void setObstructed(Boolean bool){
+        this.obstructed = bool;
+    }
+
+    @Override
+    public String toString() {
+        return this.toString(null);
+    }
+    @Override
+    public String toString(ArrayList<PathFindingNode> path) {
+        if (path != null && path.contains(this)) {
+            return " s ";
+        } else if (this.getVisited()) {
+            return " - ";
+        } else if (this.getObstructed()) {
+            return " o ";
+        } else {
+            return "   ";
+        }
+    }
+
+    public void update(double humidity, double light, double temperature) {
+		this.humidity = humidity;
+		this.light = light;
+		this.temp = temperature;
 	}
 
-	public int getItemsStored() {
-		return stored;
-	}
-	public void setItemsStored(int stored) {
-		this.stored = stored;
-	}
-	public double getTemp() {
-		return temp;
-	}
-	public void setTemp(double temp) {
-		this.temp = temp;
-	}
-	public double getLight() {
-		return light;
-	}
-	public void setLight(double light) {
-		this.light = light;
-	}
-	public Sensor getSensor() {
-		return sensor;
-	}
-	private void setSensor(Sensor sensor) {
-		this.sensor = sensor;
-	}
-	public void update(double humidity, double light, double temperature) {
-		this.setHumidity(humidity);
-		this.setLight(light);
-		this.setTemp(temperature);
-	}
-	public double getHumidity() {
-		return humidity;
-	}
-	private void setHumidity(double humidity) {
-		this.humidity = humidity;
-	}
 }

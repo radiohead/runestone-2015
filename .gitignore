@@ -5,6 +5,11 @@
 # Icon must end with two \r
 Icon
 
+#IntelliJ IDEA
+.idea/workspace.xml
+.idea/*
+Server/.idea/*
+
 # Thumbnails
 ._*
 

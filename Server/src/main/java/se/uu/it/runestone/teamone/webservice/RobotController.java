@@ -38,7 +38,8 @@ public class RobotController {
     }
 
     @RequestMapping(value = RuneURIConstants.GET_ROB, method = RequestMethod.GET)
-    public @ResponseBody Robot getRobot(@PathVariable("id") int robId) {
+    public @ResponseBody Robot getRobot(@PathVariable("id") int robId)
+    {
         return robData.get(robId);
     }
 

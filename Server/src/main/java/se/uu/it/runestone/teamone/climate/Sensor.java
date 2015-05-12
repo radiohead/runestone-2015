@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import se.uu.it.runestone.teamone.map.Node;
 import gnu.io.CommPortIdentifier;
@@ -76,6 +79,7 @@ public class Sensor extends Thread implements SerialPortEventListener{
 	
 	@Override
     public synchronized void serialEvent(SerialPortEvent oEvent) {
+        ArrayList<Double> values = new ArrayList<Double>();
         //System.out.println("Event received: " + oEvent.toString());
         try {
             switch (oEvent.getEventType() ) {
@@ -88,7 +92,12 @@ public class Sensor extends Thread implements SerialPortEventListener{
                     String inputLine = input.readLine();
                     System.out.println("Incoming <- " + inputLine);
                     // These should be parsed from sensor message.
-                    this.updateNode(1,2,3);
+                    values = parseClimate(inputLine);
+                    if(values.size() >= 3) {
+                        this.updateNode(values.get(1), values.get(2), values.get(3));
+                    } else{
+                        System.out.println("Too few values parsed from sensor.");
+                    }
                     break;
 
                 default:
@@ -101,8 +110,20 @@ public class Sensor extends Thread implements SerialPortEventListener{
         }
     }
 
-	private void updateNode(double humidity, double light, double temperature) {
-		this.node.update(humidity, light, temperature);
+	public void updateNode(double humidity, double light, double temperature) {
+		//this.node.update(humidity, light, temperature);
 	}
-	
+	private ArrayList<Double> parseClimate(String contents){
+			ArrayList < Double > result = new ArrayList < Double >();
+			Matcher m = Pattern.compile( "(?<!R)[-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?" ).matcher(contents);
+
+			while ( m.find() )
+			{
+				double element = Double.parseDouble( m.group() );
+				result.add( element );
+			}
+
+			return result;
+    }
 }
+	

@@ -1,11 +1,9 @@
 package se.uu.it.runestone.teamone;
 
-import se.uu.it.runestone.teamone.map.Map;
+import se.uu.it.runestone.teamone.map.Room;
 import se.uu.it.runestone.teamone.pathfinding.PathFinder;
 import se.uu.it.runestone.teamone.scheduler.Job;
 import se.uu.it.runestone.teamone.scheduler.Scheduler;
-
-import java.util.Queue;
 
 /**
  * The main server that hooks into robot control,
@@ -15,7 +13,7 @@ import java.util.Queue;
  */
 public class Server implements Runnable {
 
-    private Map map;
+    private Room map;
     private PathFinder pathFinder;
     private Scheduler scheduler;
 
@@ -23,7 +21,7 @@ public class Server implements Runnable {
      * The designated initializer. Creates a new server.
      */
     public Server() {
-        this.map = new Map(10,10,null); // TODO: Add sensors <akelagercrantz>
+        this.map = new Room(10,10); // TODO: Add sensors <akelagercrantz>
         this.pathFinder = new PathFinder();
         this.scheduler = new Scheduler();
 
