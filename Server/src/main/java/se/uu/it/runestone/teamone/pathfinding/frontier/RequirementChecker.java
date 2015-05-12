@@ -4,6 +4,8 @@ import se.uu.it.runestone.teamone.pathfinding.PathFindingNode;
 
 /**
  * An object checking wether the current node meets requirements.
+ *
+ * @author Åke Lagercrantz
  */
 public interface RequirementChecker {
     /**

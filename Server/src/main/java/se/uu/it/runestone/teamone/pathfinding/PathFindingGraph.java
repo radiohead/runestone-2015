@@ -5,6 +5,8 @@ import java.util.ArrayList;
 /**
  * An interface describing the neccessary attributes and methods
  * needed for a map to be able to be used by the PathFinder.
+ *
+ * @author Åke Lagercrantz
  */
 public interface PathFindingGraph {
     /**
