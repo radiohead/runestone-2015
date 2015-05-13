@@ -4,12 +4,16 @@ import se.uu.it.runestone.teamone.map.Node;
 import se.uu.it.runestone.teamone.map.Room;
 import se.uu.it.runestone.teamone.pathfinding.PathFinder;
 import se.uu.it.runestone.teamone.pathfinding.PathFindingNode;
+import se.uu.it.runestone.teamone.robotcontrol.command.Command;
+import se.uu.it.runestone.teamone.robotcontrol.command.CommandFactory;
 import se.uu.it.runestone.teamone.scheduler.Job;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
- * The dispatch handles control over robots on the warehous floor. It is given
+ * The dispatch handles control over robots on the warehouse floor. It is given
  * charge over a robot and a given job, and uses the pathfinder & map to navigate
  * the robot to it's end destination.
  *
@@ -19,6 +23,10 @@ public class Dispatch {
 
     private Room room;
     private PathFinder pathFinder;
+
+    private HashMap<Robot, Node> robotPositions;
+
+    private HashMap<Robot, ArrayList<Command>> operations;
 
     /**
      * The designated initializer. Creates a new dispatch.
@@ -41,11 +49,14 @@ public class Dispatch {
      *
      * @return The robot when the job is executed.
      */
-    public Robot dispatch(Robot robot, Job job, Node currentPosition) {
-        ArrayList<PathFindingNode> path = this.pathFinder.shortestPathToNodeMatchingRequirements(currentPosition, job.goods.getRequirements(), this.room);
+    public Robot dispatch(Robot robot, Job job, Node currentPosition, Room.Direction currentDirection) {
+        @SuppressWarnings({"unchecked"}) // We know the return type will be ArrayList<Node> since we supply the nodes ourselves.
+        ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPathToNodeMatchingRequirements(currentPosition, job.goods.getRequirements(), this.room);
 
-        // TODO: Convert path to navigational instructions. <akelagercrant>
-        // TODO: Execute navigational instrucitons one by one. <akelagercrantz>
+        ArrayList<Command> commands = CommandFactory.commandsFromPath(path, currentDirection);
+        this.operations.put(robot, commands);
+
+        // TODO: Execute operations one by one asynchronously and wait for completion.
 
         return robot;
     }

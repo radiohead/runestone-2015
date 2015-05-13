@@ -5,7 +5,7 @@ package se.uu.it.runestone.teamone.robotcontrol;
  *
  * @author Åke Lagercrantz
  */
-public class Robot {
+public class Robot extends Thread {
 
     private Communicator communicator;
     private Thread communicatorThread;
@@ -17,48 +17,9 @@ public class Robot {
      */
     public Robot() {
         this.communicator = new Communicator();
-        this.communicatorThread = new Thread(this.communicator);
     }
 
-    /**
-     * Turns the robot 90 degrees to the right.
-     *
-     * This method is synchronous and will not return until
-     * the physical robot has responded with whether the
-     * action was successfull or not.
-     *
-     * @return Whether the action was successful or not.
-     */
-    public Boolean turnRight() {
-        // TODO: Send command to robot to turn right. <akelagercrantz>
-        return false;
-    }
-
-    /**
-     * Turns the robot 90 degrees to the left.
-     *
-     * This method is synchronous and will not return until
-     * the physical robot has responded with whether the
-     * action was successfull or not.
-     *
-     * @return Whether the action was successful or not.
-     */
-    public Boolean turnLeft() {
-        // TODO: Send command to robot to turn left. <akelagercrantz>
-        return false;
-    }
-
-    /**
-     * Moves the robot forward one grid space.
-     *
-     * This method is synchronous and will not return until
-     * the physical robot has responded with whether the
-     * action was successfull or not.
-     *
-     * @return Whether the action was successful or not.
-     */
-    public Boolean navigateForward() {
-        // TODO: Send command to robot to nagivate forward. <akelagercrantz>
-        return false;
-    }
+    // TODO: Add methods for inter-thread communication with the dispatch.
+    // The robot need to wait for commands from dispatch, and return the
+    // success status asynchronously.
 }

@@ -16,6 +16,23 @@ import se.uu.it.runestone.teamone.climate.*;
  */
 
 public class Room implements PathFindingGraph {
+
+	/**
+	 * Represents a direction the robot can face. Does not
+	 * map to actual direction, but rather the orientation of
+	 * the warehouse, where north is up and south is down
+	 * on the grid map.
+	 *
+	 * @author Åke Lagercrantz
+	 */
+	public enum Direction {
+		NORTH,
+		WEST,
+		SOUTH,
+		EAST,
+		NONE
+	}
+
 	private ArrayList<Node> node;
 	private ArrayList<Sensor> sensorList;
 	private int dimX;
@@ -71,6 +88,32 @@ public class Room implements PathFindingGraph {
 		return result;
 	}*/
 
+	/**
+	 * Returns the navigational direction in the warehouse when
+	 * navigating between two nodes.
+	 *
+	 * @author Åke Lagercrantz
+	 *
+	 * @param from  The node to start from.
+	 * @param to	The node to navigate to, which determines the direction.
+	 *
+	 * @return The direction required to navigate between the nodes.
+	 */
+	public static Direction direction(Node from, Node to) {
+
+		if (from.getX() > to.getX()) {
+			return Direction.WEST;
+		} else if (from.getX() < to.getX()) {
+			return Direction.EAST;
+		} else if (from.getY() > to.getY()) {
+			return Direction.NORTH;
+		} else if (from.getY() > to.getY()) {
+			return Direction.SOUTH;
+		} else {
+			return Direction.NONE;
+		}
+	}
+
     @Override
     public ArrayList<PathFindingNode> neighbours(PathFindingNode node) {
         Integer x = ((Node) node).getX();
@@ -82,7 +125,7 @@ public class Room implements PathFindingGraph {
         if (y > 0) {
             neighbours.add(this.nodeFromCoordinates(x, y-1));
         }
-        // Left
+        // TurnLeft
         if (x > 0) {
             neighbours.add(this.nodeFromCoordinates(x-1, y));
         }
@@ -90,7 +133,7 @@ public class Room implements PathFindingGraph {
         if (y < this.getDimY() - 1) {
             neighbours.add(this.nodeFromCoordinates(x, y+1));
         }
-        // Right
+        // TurnRight
         if (x < this.getDimX() - 1) {
             neighbours.add(this.nodeFromCoordinates(x+1, y));
         }

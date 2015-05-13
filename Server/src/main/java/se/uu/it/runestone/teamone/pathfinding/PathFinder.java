@@ -1,5 +1,6 @@
 package se.uu.it.runestone.teamone.pathfinding;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
@@ -37,7 +38,7 @@ public class PathFinder {
    *
    * @return The shortest path from start to target.
    */
-  public ArrayList<PathFindingNode> shortestPath(final PathFindingNode from, final PathFindingNode goal, final PathFindingGraph graph) {
+  public ArrayList<? extends PathFindingNode> shortestPath(final PathFindingNode from, final PathFindingNode goal, final PathFindingGraph graph) {
     RequirementChecker requirementChecker = new RequirementChecker() {
       public Boolean nodeMeetsRequirements(PathFindingNode node) {
         return node.equals(goal);
@@ -64,7 +65,7 @@ public class PathFinder {
    *
    * @return The shortest path from start to a suitable target.
    */
-  public ArrayList<PathFindingNode> shortestPathToNodeMatchingRequirements(final PathFindingNode from, final PathFindingRequirements requirements, final PathFindingGraph graph) {
+  public ArrayList<? extends PathFindingNode> shortestPathToNodeMatchingRequirements(final PathFindingNode from, final PathFindingRequirements requirements, final PathFindingGraph graph) {
     RequirementChecker requirementChecker = new RequirementChecker() {
       public Boolean nodeMeetsRequirements(PathFindingNode node) {
         return graph.nodeMeetsRequirements(node, requirements);

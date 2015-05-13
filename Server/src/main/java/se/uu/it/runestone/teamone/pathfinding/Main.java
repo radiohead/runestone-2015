@@ -57,7 +57,7 @@ class Map implements PathFindingGraph {
         if (y > 0) {
             neighbours.add(this.nodeFromCoordinates(x, y-1));
         }
-        // Left
+        // TurnLeft
         if (x > 0) {
             neighbours.add(this.nodeFromCoordinates(x-1, y));
         }
@@ -65,7 +65,7 @@ class Map implements PathFindingGraph {
         if (y < this.height - 1) {
             neighbours.add(this.nodeFromCoordinates(x, y+1));
         }
-        // Right
+        // TurnRight
         if (x < this.width - 1) {
             neighbours.add(this.nodeFromCoordinates(x+1, y));
         }
