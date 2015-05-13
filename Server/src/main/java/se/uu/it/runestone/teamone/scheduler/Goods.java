@@ -1,5 +1,7 @@
 package se.uu.it.runestone.teamone.scheduler;
 
+import se.uu.it.runestone.teamone.pathfinding.frontier.RequirementChecker;
+
 /**
  * Represents some kind of goods that needs to be stored in the warehouse.
  *
@@ -7,36 +9,13 @@ package se.uu.it.runestone.teamone.scheduler;
  */
 public class Goods {
 
-    private Integer size;
+    private Requirements requirements;
     /**
-     * The size of the goods to be storde.
-     *
-     * A hard requirement for the storage space.
+     * The requirements needed to store these goods in
+     * a warehouse.
      */
-    public Integer getSize() {
-       return this.size;
-    }
-
-    private Float maxTemperature;
-    /**
-     * The maximum temperature this goods can be stored in
-     * before going bad.
-     *
-     * A hard requirement for the storage space.
-     */
-    public Float getMaxTemperature() {
-        return this.maxTemperature;
-    }
-
-    private Float maxLightIntensity;
-    /**
-     * The maximum light intensity this goods can be stored
-     * in before going bad.
-     *
-     * A hard requirement for the storage space.
-     */
-    public Float getMaxLightIntensity() {
-        return this.maxLightIntensity;
+    public Requirements getRequirements() {
+       return this.requirements;
     }
 
     /**
@@ -50,8 +29,6 @@ public class Goods {
      *                          can be stored in before going bad.
      */
     public Goods(Integer size, Float maxTemperature, Float maxLightIntensity) {
-        this.size = size;
-        this.maxTemperature = maxTemperature;
-        this.maxLightIntensity = maxLightIntensity;
+        this.requirements = new Requirements(size, maxTemperature, maxLightIntensity);
     }
 }

@@ -1,5 +1,8 @@
 package se.uu.it.runestone.teamone.scheduler;
 
+import se.uu.it.runestone.teamone.robotcontrol.Robot;
+
+import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 /**
@@ -14,6 +17,8 @@ public class Scheduler {
 
     private PriorityQueue<Job> queue;
     private JobComparator jobComparator;
+
+    private ArrayList<Robot> availableRobots;
 
     /**
      * The designated initializer. Creates a new scheduler.
