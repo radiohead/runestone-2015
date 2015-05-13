@@ -17,19 +17,19 @@ import java.util.ArrayList;
  *
  * @author Åke Lagercrantz
  */
-public class Server implements Runnable {
+public class Server extends Thread implements Runnable {
 
-    private Room map;
+    /*private Room map;
     private PathFinder pathFinder;
     private Scheduler scheduler;
     private Dispatch dispatch;
 
-    private ArrayList<Robot> robots;
+    private ArrayList<Robot> robots;*/
 
     /**
      * The designated initializer. Creates a new server.
      */
-    public Server() {
+    /*public Server() {
         this.map = new Room(10,10); // TODO: Add sensors <akelagercrantz>
         this.pathFinder = new PathFinder();
         this.scheduler = new Scheduler();
@@ -38,6 +38,12 @@ public class Server implements Runnable {
         this.robots.add(new Robot()); // TODO: Give robot coms info. <akelagercrantz>
 
         this.dispatch = new Dispatch(map, pathFinder);
+    }*/
+    public Server(Room map1, PathFinder pathFinder, Scheduler scheduler, Dispatch dispatch,ArrayList<Robot> robots){
+        map1.setX(3);
+        //while(true){
+            //Bara för att låsa tråden
+        //}
     }
 
     @Override

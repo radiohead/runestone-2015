@@ -46,6 +46,9 @@ public class Room implements PathFindingGraph {
 	public int getDimX() {
 		return dimX;
 	}
+	public void setX(int newX){
+		this.dimX = newX;
+	}
 
 
     public Node nodeFromCoordinates(Integer x, Integer y) {
