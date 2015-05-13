@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 /**
  * An interface describing a node in a PathFindingGraph.
+ *
+ * @author Åke Lagercrantz
  */
 public interface PathFindingNode {
     public Integer getX();

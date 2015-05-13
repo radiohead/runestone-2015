@@ -4,6 +4,8 @@ import se.uu.it.runestone.teamone.pathfinding.PathFindingNode;
 
 /**
  * An object supplying priorities for frontier nodes.
+ *
+ * @author Åke Lagercrantz
  */
 public interface PrioritySupplier {
     /**

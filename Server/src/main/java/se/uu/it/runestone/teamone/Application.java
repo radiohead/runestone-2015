@@ -5,14 +5,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 
-@SpringBootApplication               // 1
+
+/**
+ * The main application. Starts a server as well as a Spring instance.
+ *
+ * @author Åke Lagercrantz
+ */
+@SpringBootApplication
 @IntegrationComponentScan
 public class Application {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(Application.class, args);
 
-        //Server server = new Server();
-        //server.run();
+        new Thread(new Server());
     }
 }
