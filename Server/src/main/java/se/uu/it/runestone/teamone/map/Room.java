@@ -15,7 +15,7 @@ import se.uu.it.runestone.teamone.climate.*;
  * @author Daniel Eliassen
  */
 
-public class Room extends Thread implements PathFindingGraph {
+public class Room implements PathFindingGraph {
 	private ArrayList<Node> node;
 	private ArrayList<Sensor> sensorList;
 	private int dimX;
@@ -156,21 +156,6 @@ public class Room extends Thread implements PathFindingGraph {
 	private void updateTemp(){
 		for(Sensor sensor : this.sensorList){
 			// Used to retrieve data form sensor.
-		}
-	}
-
-	public void run(){
-		System.out.println("[ROOM"+this.getName()+"]: " + this.getDimX() + "x"+ this.getDimY() + "-room created.");
-		while(true){
-				try {
-					Thread.sleep(15000);
-                    System.out.println("[ROOM" + this.getName() + "]: Updating temperature from sensors.");
-					this.updateTemp();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-                    System.out.println("[ROOM"+this.getName()+"]: Exited, InterruptedException.");
-					e.printStackTrace();
-				}
 		}
 	}
 

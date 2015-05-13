@@ -11,19 +11,19 @@ import java.util.*;
 @RestController
 public class RoomController {
     //Map to store robots, ideally we should use database
-    java.util.Map<Integer, RoomTest> roomData = new HashMap<Integer, RoomTest>();
+    java.util.Map<Integer, Room> roomData = new HashMap<Integer, Room>();
 
     @RequestMapping(value = RuneURIConstants.DUMMY_ROOM, method = RequestMethod.GET)
     public @ResponseBody
-    RoomTest getDummyRoom() {
-        RoomTest dummyRoom = new RoomTest(10, 10);
+    Room getDummyRoom() {
+        Room dummyRoom = new Room(10, 10);
         return dummyRoom;
     }
 
     @RequestMapping(value = RuneURIConstants.GET_ROOM, method = RequestMethod.GET)
     public @ResponseBody
-    RoomTest getRoom(@PathVariable("id") int roomID){
-        RoomTest room = roomData.get(roomID);
+    Room getRoom(@PathVariable("id") int roomID){
+        Room room = roomData.get(roomID);
         return room;
     }
 
