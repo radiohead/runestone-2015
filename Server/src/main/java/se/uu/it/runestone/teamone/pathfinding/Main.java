@@ -14,7 +14,7 @@ public class Main {
         PathFindingNode goal = map.nodeFromCoordinates(9, 9);
 
         // Shortest path from A to B
-        ArrayList<PathFindingNode> path = pathfinder.shortestPath(start, goal, map);
+        ArrayList<? extends PathFindingNode> path = pathfinder.shortestPath(start, goal, map);
 
         // Shortest path from A to node matching reqs. Modify reqs in Map - nodeMeetsRequirements.
         //ArrayList<PathFindingNode> path = pathfinder.shortestPathToNodeMatchingRequirements(start, null, map);

@@ -50,7 +50,7 @@ public class Node implements PathFindingNode{
         return this.toString(null);
     }
     @Override
-    public String toString(ArrayList<PathFindingNode> path) {
+    public String toString(ArrayList<? extends PathFindingNode> path) {
         if (path != null && path.contains(this)) {
             return " s ";
         } else if (this.getVisited()) {

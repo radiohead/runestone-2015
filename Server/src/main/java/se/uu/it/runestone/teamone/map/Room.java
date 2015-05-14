@@ -175,7 +175,7 @@ public class Room implements PathFindingGraph {
 		return this.toString(null);
 	}
 
-	public String toString(ArrayList<PathFindingNode> path) {
+	public String toString(ArrayList<? extends PathFindingNode> path) {
 		String map = "";
 
 		for (Integer i = 0; i < this.getDimX(); i++) {

@@ -12,5 +12,5 @@ public interface PathFindingNode {
     public Integer getY();
     public Boolean getVisited();
     public Boolean getObstructed();
-    public String toString(ArrayList<PathFindingNode> path);
+    public String toString(ArrayList<? extends PathFindingNode> path);
 }
