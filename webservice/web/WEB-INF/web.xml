@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+    <!-- All servlets providers -->
+    <servlet>
+        <servlet-name>RoomServlet</servlet-name>
+        <servlet-class>RoomServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>RobotServlet</servlet-name>
+        <servlet-class>RobotServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>SensorServlet</servlet-name>
+        <servlet-class>SensorServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>GotoServlet</servlet-name>
+        <servlet-class>GotoServlet</servlet-class>
+    </servlet>
+
+
+    <!-- All servlets mappings -->
+    <servlet-mapping>
+        <servlet-name>RoomServlet</servlet-name>
+        <url-pattern>/room</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>RobotServlet</servlet-name>
+        <url-pattern>/robot</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SensorServlet</servlet-name>
+        <url-pattern>/sensor</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GotoServlet</servlet-name>
+        <url-pattern>/goto</url-pattern>
+    </servlet-mapping>
+
+
+</web-app>
