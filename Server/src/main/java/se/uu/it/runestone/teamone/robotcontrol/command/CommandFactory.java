@@ -22,16 +22,18 @@ public class CommandFactory {
      * @return The commands to be executed serially for the robot to navigate the path.
      */
     public static ArrayList<Command> commandsFromPath(ArrayList<Node> path, Room.Direction initialDirection) {
-        return CommandFactory.commandsFromPath(path, initialDirection, new ArrayList<>());
+        return CommandFactory.commandsFromPath(path, initialDirection, new ArrayList<Command>());
     }
 
     private static ArrayList<Command> commandsFromPath(ArrayList<Node> remainingPath, Room.Direction currentDirection, ArrayList<Command> accumulator) {
+        if (remainingPath.size() < 2) { // Finished
+            return accumulator;
+        }
+
         Node from = remainingPath.get(0);
         Node to = remainingPath.get(1);
 
-        if (remainingPath.size() == 0) { // Finished
-            return accumulator;
-        } else if (Room.direction(from, to) == currentDirection) { // Move forward
+        if (Room.direction(from, to) == currentDirection) { // Move forward
             remainingPath.remove(from);
             MoveForward moveForwardCommand = new MoveForward();
             accumulator.add(moveForwardCommand);

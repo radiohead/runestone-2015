@@ -7,8 +7,10 @@ package se.uu.it.runestone.teamone;
  */
 public class Application {
     public static void main(String[] args) {
-        Thread thread = new Thread(new Server());
         System.out.println("Spawning server thread");
+        Thread thread = new Thread(new Server());
+        System.out.println("Starting server thread");
         thread.start();
+        System.out.println("Server thread started.");
     }
 }
