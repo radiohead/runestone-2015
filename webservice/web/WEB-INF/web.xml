@@ -13,6 +13,15 @@
         <servlet-name>RobotServlet</servlet-name>
         <servlet-class>RobotServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>SensorServlet</servlet-name>
+        <servlet-class>SensorServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>GotoServlet</servlet-name>
+        <servlet-class>GotoServlet</servlet-class>
+    </servlet>
+
 
     <!-- All servlets mappings -->
     <servlet-mapping>
@@ -22,6 +31,14 @@
     <servlet-mapping>
         <servlet-name>RobotServlet</servlet-name>
         <url-pattern>/robot</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SensorServlet</servlet-name>
+        <url-pattern>/sensor</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GotoServlet</servlet-name>
+        <url-pattern>/goto</url-pattern>
     </servlet-mapping>
 
 

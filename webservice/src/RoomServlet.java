@@ -8,13 +8,6 @@ import java.io.*;
 public class RoomServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         PrintWriter out = response.getWriter();
-        out.println("Hello, this is room!!!!!");
-    }
-
-    public String fetchFromServer(String room){
-        //Setup a socket connection and send room
-
-        //Recieve something from Socket and return something
-        return room;
+        out.println(SocketConnection.fetch("map"));
     }
 }

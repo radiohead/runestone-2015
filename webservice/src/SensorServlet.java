@@ -7,9 +7,9 @@ import java.io.PrintWriter;
 /**
  * Created by Lelli on 15/05/15.
  */
-public class RobotServlet extends HttpServlet {
+public class SensorServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         PrintWriter out = response.getWriter();
-        out.println(SocketConnection.fetch("robot"));
+        out.println(SocketConnection.fetch("sensor"));
     }
 }
