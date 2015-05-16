@@ -44,17 +44,28 @@ public class Dispatch implements Runnable {
         this.pathFinder = pathFinder;
         this.scheduler = scheduler;
         this.robot = robot;
-        this.executing = false;
+
+        this.executing = false;;
+        this.abortCurrentJob = false;
+        this.manualMode = false;
+        this.manualDestination = null;
     }
 
     @Override
     public void run() {
         Job job;
 
+        System.out.println("Dispatch - Running main loop.");
+
         while (true) {
             if (this.manualMode) {
+                System.out.println("Dispatch - Starting manual job with destination (" +
+                        this.manualDestination.getX().toString() + ", " + this.manualDestination.getY().toString() + ").");
+
                 this.dispatch(this.robot, this.manualDestination);
             } else if ((job = scheduler.nextJob()) != null) {
+                System.out.println("Dispatch - Starting next job in queue.");
+
                 this.dispatch(this.robot, job);
             } else {
                 try {
@@ -71,7 +82,7 @@ public class Dispatch implements Runnable {
      * @param destination The destination to navigate to.
      */
     public void setManualMode(Node destination) {
-        System.out.println("Setting manual mode");
+        System.out.println("Dispatch - Entering manual mode.");
         this.manualMode = true;
         this.manualDestination = destination;
         this.abortCurrentJob = true;
@@ -86,8 +97,6 @@ public class Dispatch implements Runnable {
      * @param job   The job to execute.
      */
     private void dispatch(Robot robot, Job job) {
-        System.out.println("Going to node matching reqs.");
-
         @SuppressWarnings({"unchecked"}) // We know the return type will be ArrayList<Node> since we supply the nodes ourselves.
         ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPathToNodeMatchingRequirements(robot.getCurrentPosition(), job.goods.getRequirements(), this.room);
 
@@ -103,8 +112,6 @@ public class Dispatch implements Runnable {
      * @param destination   The destination to navigate to.
      */
     private void dispatch(Robot robot, Node destination) {
-        System.out.println("Going to " + destination.getX().toString() + ", " + destination.getY().toString());
-
         @SuppressWarnings({"unchecked"}) // We know the return type will be ArrayList<Node> since we supply the nodes ourselves.
         ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPath(robot.getCurrentPosition(), destination, this.room);
 
@@ -125,12 +132,14 @@ public class Dispatch implements Runnable {
      */
     private Boolean executeCommands(Robot robot, ArrayList<Command> commands) {
         if (this.executing) {
-            System.out.println("Dispatch - already executing. Not taking on new commands.");
+            System.out.println("Dispatch - Already executing. Not taking on new commands.");
             return false;
         }
 
         this.executing = true;
-        System.out.println("Dispatch - executing commands..");
+        this.abortCurrentJob = false;
+
+        System.out.println("Dispatch - Preparing to execute " + commands.size() + " commands.");
 
         for (int i = 0; i < commands.size(); i++) {
             if (this.abortCurrentJob) {
@@ -143,7 +152,7 @@ public class Dispatch implements Runnable {
             Command command = commands.remove(0);
             while (true) {
                 if (this.robot.setCurrentCommand(command)) {
-                    System.out.println("Dispatch - executing command " + command.toString());
+                    System.out.println("Dispatch - Executing command \"" + command.toString() + "\"");
                 } else {
                     try {
                         Thread.sleep(200);
@@ -153,7 +162,7 @@ public class Dispatch implements Runnable {
         }
 
         this.executing = false;
-        System.out.println("Dispatch - execution complete.");
+        System.out.println("Dispatch - Execution complete.");
 
         return true;
     }

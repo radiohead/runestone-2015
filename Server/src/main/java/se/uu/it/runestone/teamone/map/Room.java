@@ -48,7 +48,7 @@ public class Room implements PathFindingGraph {
 			for(int j=0;j<xs;j++){
                 if ((j == 2 && i != this.getDimY() % 8 ) || ( j == 6 && i != this.getDimY()-4) ){
                     temp = new Node(j,i,true);
-                    System.out.println("Setting ["+j+","+i+"] to obstructed");
+                    System.out.println("Room - Setting ["+j+","+i+"] to obstructed");
                 } else {
                     temp = new Node(j,i,false);
                 }

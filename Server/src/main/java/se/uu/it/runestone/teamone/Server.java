@@ -34,38 +34,40 @@ public class Server extends Thread implements Runnable, ListenerDelegate {
      * The designated initializer. Creates a new server.
      */
     public Server() {
-        System.out.println("Initializing server.");
+        System.out.println("Server - Initializing server.");
 
-        System.out.println("Creating map.");
+        System.out.println("Server - Creating map.");
         this.map = new Room(10,10); // TODO: Addc sensors <akelagercrantz>
-        System.out.println("Creating pathfinder.");
+        System.out.println("Server - Creating pathfinder.");
         this.pathFinder = new PathFinder();
-        System.out.println("Creating scheduler.");
+        System.out.println("Server - Creating scheduler.");
         this.scheduler = new Scheduler();
 
-        System.out.println("Creating robot.");
+        System.out.println("Server - Creating robot.");
         this.robot = new Robot(); // TODO: Give robot coms info. <akelagercrantz>
         this.robot.setCurrentPosition(this.map.nodeFromCoordinates(0,0));
         this.robot.setCurrentDirection(Room.Direction.EAST);
 
-        System.out.println("Creating dispatch.");
+        System.out.println("Server - Creating dispatch.");
         this.dispatch = new Dispatch(this.robot, this.map, this.pathFinder, this.scheduler);
-        new Thread(this.dispatch);
+        Thread dispatchThread = new Thread(this.dispatch);
+        System.out.println("Server - Spawning dispatch thread.");
+        dispatchThread.start();
 
-        System.out.println("Creating api listener.");
+        System.out.println("Server - Creating api listener.");
         try {
             this.listener = new Listener(4444, this);
         } catch (IOException e) {
-            System.out.println("Could not create api listener.");
+            System.out.println("Server - Could not create api listener.");
         }
 
-        System.out.println("Server initialization complete.");
+        System.out.println("Server - Initialization complete.");
     }
 
     @Override
     public void run() {
         try {
-            System.out.println("Listening for api comms.");
+            System.out.println("Server - Listening for api comms.");
             this.listener.listen();
         } catch (IOException e) {
             System.out.println("IOException in api listener");

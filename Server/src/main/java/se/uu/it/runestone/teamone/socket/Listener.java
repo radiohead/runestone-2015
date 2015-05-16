@@ -36,20 +36,17 @@ public class Listener {
 
         Boolean exit = false;
         while (!exit) {
-            System.out.println("Waiting for connection on port " + this.port.toString());
+            System.out.println("Listener - Waiting for connection on port " + this.port.toString() + ".");
             this.socket = serverSocket.accept();
-            System.out.println("Connected on port " + this.port.toString());
+            System.out.println("Listener - Connected on port " + this.port.toString());
 
             this.out = new PrintWriter(socket.getOutputStream(), true);
             this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             while ((input = in.readLine()) != null) {
-                System.out.println("Received command: " + input);
+                System.out.println("Listener - Received command \"" + input + "\"");
 
-                if (input.equals("Quit")) {
-                    exit = true;
-                    break;
-                } else if (input.equals("map")) { // map
+                if (input.equals("map")) { // map
                     Integer width = this.delegate.warehouseWidth();
                     Integer height = this.delegate.warehouseHeight();
                     out.println(width.toString() + "," + height.toString()); // <x>,<y>
@@ -64,7 +61,7 @@ public class Listener {
                 }
             }
 
-            System.out.println("Connection closed.");
+            System.out.println("Listener - Connection closed.");
         }
     }
 }
