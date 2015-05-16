@@ -30,6 +30,9 @@ public class Dispatch implements Runnable {
     private Boolean manualMode;
     private Node manualDestination;
 
+    private Boolean abortCurrentJob;
+    private Boolean executing;
+
     /**
      * The designated initializer. Creates a new dispatch.
      *
@@ -41,14 +44,18 @@ public class Dispatch implements Runnable {
         this.pathFinder = pathFinder;
         this.scheduler = scheduler;
         this.robot = robot;
+        this.executing = false;
     }
 
     @Override
     public void run() {
+        Job job;
+
         while (true) {
-            Job job;
-            if (!this.manualMode && (job = scheduler.nextJob()) != null) {
-                this.dispatch(this.robot, job, this.robot.getCurrentPosition(), this.robot.getCurrentDirection());
+            if (this.manualMode) {
+                this.dispatch(this.robot, this.manualDestination);
+            } else if ((job = scheduler.nextJob()) != null) {
+                this.dispatch(this.robot, job);
             } else {
                 try {
                     Thread.sleep(200);
@@ -66,7 +73,8 @@ public class Dispatch implements Runnable {
     public void setManualMode(Node destination) {
         System.out.println("Setting manual mode");
         this.manualMode = true;
-        this.dispatch(this.robot, destination, this.robot.getCurrentPosition(), this.robot.getCurrentDirection());
+        this.manualDestination = destination;
+        this.abortCurrentJob = true;
     }
 
     /**
@@ -77,13 +85,13 @@ public class Dispatch implements Runnable {
      * @param robot The robot to dispatch.
      * @param job   The job to execute.
      */
-    private void dispatch(Robot robot, Job job, Node currentPosition, Room.Direction currentDirection) {
+    private void dispatch(Robot robot, Job job) {
         System.out.println("Going to node matching reqs.");
 
         @SuppressWarnings({"unchecked"}) // We know the return type will be ArrayList<Node> since we supply the nodes ourselves.
-        ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPathToNodeMatchingRequirements(currentPosition, job.goods.getRequirements(), this.room);
+        ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPathToNodeMatchingRequirements(robot.getCurrentPosition(), job.goods.getRequirements(), this.room);
 
-        ArrayList<Command> commands = CommandFactory.commandsFromPath(path, currentDirection);
+        ArrayList<Command> commands = CommandFactory.commandsFromPath(path, robot.getCurrentDirection());
 
         this.executeCommands(robot, commands);
     }
@@ -91,18 +99,16 @@ public class Dispatch implements Runnable {
     /**
      * Dispatches a robot to navigate to a destination.
      *
-     * @param robot             The robot to dispatch.
-     * @param destination       The destination to navigate to.
-     * @param currentPosition   The robots current position.
-     * @param currentDirection  The robots current direction.
+     * @param robot         The robot to dispatch.
+     * @param destination   The destination to navigate to.
      */
-    private void dispatch(Robot robot, Node destination, Node currentPosition, Room.Direction currentDirection) {
+    private void dispatch(Robot robot, Node destination) {
         System.out.println("Going to " + destination.getX().toString() + ", " + destination.getY().toString());
 
         @SuppressWarnings({"unchecked"}) // We know the return type will be ArrayList<Node> since we supply the nodes ourselves.
-        ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPath(currentPosition, destination, this.room);
+        ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPath(robot.getCurrentPosition(), destination, this.room);
 
-        ArrayList<Command> commands = CommandFactory.commandsFromPath(path, currentDirection);
+        ArrayList<Command> commands = CommandFactory.commandsFromPath(path, robot.getCurrentDirection());
 
         this.executeCommands(robot, commands);
     }
@@ -114,22 +120,42 @@ public class Dispatch implements Runnable {
      *
      * @param robot     The robot to execute on.
      * @param commands  The commands to execute.
+     *
+     * @return Whether the commands were executed successfully.
      */
-    private void executeCommands(Robot robot, ArrayList<Command> commands) {
+    private Boolean executeCommands(Robot robot, ArrayList<Command> commands) {
+        if (this.executing) {
+            System.out.println("Dispatch - already executing. Not taking on new commands.");
+            return false;
+        }
+
+        this.executing = true;
+        System.out.println("Dispatch - executing commands..");
+
         for (int i = 0; i < commands.size(); i++) {
-            if (this.manualMode) {
-                break;
+            if (this.abortCurrentJob) {
+                System.out.println("Dispatch - aborting current job.");
+                this.abortCurrentJob = false;
+                this.executing = false;
+                return false;
             }
 
+            Command command = commands.remove(0);
             while (true) {
-                Command command = commands.remove(0);
-                if (!this.robot.setCurrentCommand(command)) {
+                if (this.robot.setCurrentCommand(command)) {
+                    System.out.println("Dispatch - executing command " + command.toString());
+                } else {
                     try {
                         Thread.sleep(200);
                     } catch (Exception e) {}
                 }
             }
         }
+
+        this.executing = false;
+        System.out.println("Dispatch - execution complete.");
+
+        return true;
     }
 
 }

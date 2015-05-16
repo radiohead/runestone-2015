@@ -6,4 +6,9 @@ package se.uu.it.runestone.teamone.robotcontrol.command;
  * @author Åke Lagercrantz
  */
 public class MoveForward extends Command {
+
+    @Override
+    public String toString() {
+        return "forward";
+    }
 }
