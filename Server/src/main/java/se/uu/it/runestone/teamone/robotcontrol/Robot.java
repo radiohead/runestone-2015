@@ -25,11 +25,13 @@ public class Robot implements Runnable {
      * TODO: Add communication info parameters.
      */
     public Robot() {
+        System.out.println("Rboot - Creating communicator.");
         this.communicator = new Communicator();
     }
 
     @Override
     public void run() {
+        System.out.println("Robot - Running main loop.");
         while (true) {
             Command command = this.getCurrentCommand();
             if (command == null) {
@@ -37,6 +39,7 @@ public class Robot implements Runnable {
                     Thread.sleep(200);
                 } catch (Exception e) { }
             } else {
+                System.out.println("Robot - sending command \"" + command + "\" to robot.");
                 this.communicator.sendCommand(command);
                 this.setCurrentCommand(null);
             }
@@ -101,16 +104,15 @@ public class Robot implements Runnable {
      *
      * @param currentCommand The new command to be executed.
      */
-    public Boolean setCurrentCommand(Command currentCommand) {
-        if (this.currentCommand == null) {
+    public synchronized Boolean setCurrentCommand(Command currentCommand) {
+        if (currentCommand == null) {
+            this.currentCommand = null;
+            return true;
+        } else if (this.currentCommand == null) {
             this.currentCommand = currentCommand;
             return true;
         } else {
             return false;
         }
     }
-
-    // TODO: Add methods for inter-thread communication with the dispatch.
-    // The robot need to wait for commands from dispatch, and return the
-    // success status asynchronously.
 }

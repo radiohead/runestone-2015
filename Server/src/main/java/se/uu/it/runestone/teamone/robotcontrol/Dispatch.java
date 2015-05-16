@@ -58,12 +58,12 @@ public class Dispatch implements Runnable {
         System.out.println("Dispatch - Running main loop.");
 
         while (true) {
-            if (this.manualMode) {
+            if (this.manualMode && this.manualDestination != null) {
                 System.out.println("Dispatch - Starting manual job with destination (" +
                         this.manualDestination.getX().toString() + ", " + this.manualDestination.getY().toString() + ").");
 
                 this.dispatch(this.robot, this.manualDestination);
-            } else if ((job = scheduler.nextJob()) != null) {
+            } else if (!this.manualMode && (job = scheduler.nextJob()) != null) {
                 System.out.println("Dispatch - Starting next job in queue.");
 
                 this.dispatch(this.robot, job);
@@ -150,18 +150,21 @@ public class Dispatch implements Runnable {
             }
 
             Command command = commands.remove(0);
+
             while (true) {
                 if (this.robot.setCurrentCommand(command)) {
                     System.out.println("Dispatch - Executing command \"" + command.toString() + "\"");
+                    break;
                 } else {
                     try {
                         Thread.sleep(200);
-                    } catch (Exception e) {}
+                    } catch (Exception e) { }
                 }
             }
         }
 
         this.executing = false;
+        this.manualDestination = null;
         System.out.println("Dispatch - Execution complete.");
 
         return true;
