@@ -48,7 +48,7 @@ public class Room implements PathFindingGraph {
 			for(int j=0;j<xs;j++){
                 if ((j == 2 && i != this.getDimY() % 8 ) || ( j == 6 && i != this.getDimY()-4) ){
                     temp = new Node(j,i,true);
-                    System.out.println("Setting ["+j+","+i+"] to obstructed");
+                    System.out.println("Room - Setting ["+j+","+i+"] to obstructed");
                 } else {
                     temp = new Node(j,i,false);
                 }
@@ -142,7 +142,7 @@ public class Room implements PathFindingGraph {
     }
 
 	@Override
-	public Integer cost(PathFindingNode node, PathFindingNode neighbour) {
+	public synchronized Integer cost(PathFindingNode node, PathFindingNode neighbour) {
 	ArrayList<PathFindingNode> neighbours = neighbours(node);
 		if(neighbours.contains(neighbour) && neighbour.getObstructed() == false){
 			return 1;
@@ -152,18 +152,18 @@ public class Room implements PathFindingGraph {
 	}
 
 	@Override
-	public Integer distance(PathFindingNode a, PathFindingNode b) {
+	public synchronized Integer distance(PathFindingNode a, PathFindingNode b) {
 		return Math.abs(a.getX() - b.getX())+Math.abs(a.getY() - b.getY());
 	}
 
 	@Override
-	public Boolean nodeMeetsRequirements(PathFindingNode node,	PathFindingRequirements requirements) {
+	public synchronized Boolean nodeMeetsRequirements(PathFindingNode node,	PathFindingRequirements requirements) {
 		// TODO Auto-generated method stub
         return ((Node)node).getX() == 9 && ((Node) node).getY() == 2;
 	}
 
     @Override
-    public void didVisitNode(PathFindingNode node) {
+    public synchronized void didVisitNode(PathFindingNode node) {
         ((Node)node).setVisited(true);
         //System.out.println(this);
     }

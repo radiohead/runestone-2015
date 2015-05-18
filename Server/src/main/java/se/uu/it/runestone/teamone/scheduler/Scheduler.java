@@ -24,16 +24,7 @@ public class Scheduler {
      * The designated initializer. Creates a new scheduler.
      */
     public Scheduler() {
-        this.queue = new PriorityQueue<>(100, new JobComparator());
-    }
-
-    /**
-     * Whether there are jobs waiting.
-     *
-     * @return Whether there are jobs waiting.
-     */
-    public Boolean hasJobsWaiting() {
-        return !this.queue.isEmpty();
+        this.queue = new PriorityQueue<Job>(100, new JobComparator());
     }
 
     /**
@@ -41,7 +32,11 @@ public class Scheduler {
      *
      * @return The next Job in the queue.
      */
-    public Job nextJob() {
+    public synchronized Job nextJob() {
+        if (this.queue.isEmpty()) {
+            return null;
+        }
+
         return this.queue.poll();
     }
 
@@ -50,7 +45,7 @@ public class Scheduler {
      *
      * @param job The job to add.
      */
-    public void scheduleJob(Job job) {
+    public synchronized void scheduleJob(Job job) {
         this.queue.add(job);
     }
 }

@@ -1,6 +1,5 @@
 package se.uu.it.runestone.teamone.pathfinding;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
@@ -100,14 +99,14 @@ public class PathFinder {
    *                            the frontier.
    */
   private ArrayList<PathFindingNode> shortestPathWithPriorityAndRequirementFunction(PathFindingNode from, PathFindingGraph graph, RequirementChecker requirementChecker, PrioritySupplier prioritySupplier) {
-    PriorityQueue<FrontierNode> frontier = new PriorityQueue<>(100, this.frontierComparator);
+    PriorityQueue<FrontierNode> frontier = new PriorityQueue<FrontierNode>(100, this.frontierComparator);
     FrontierNode start = new FrontierNode(from, 0);
     frontier.add(start);
 
-    HashMap<PathFindingNode,PathFindingNode> links = new HashMap<>();
+    HashMap<PathFindingNode,PathFindingNode> links = new HashMap<PathFindingNode,PathFindingNode>();
     links.put(from, null);
 
-    HashMap<PathFindingNode,Integer> costs = new HashMap<>();
+    HashMap<PathFindingNode,Integer> costs = new HashMap<PathFindingNode,Integer>();
     costs.put(from, 0);
 
     FrontierNode currentFrontier;

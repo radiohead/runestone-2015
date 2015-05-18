@@ -7,6 +7,7 @@ import se.uu.it.runestone.teamone.pathfinding.PathFindingNode;
 import se.uu.it.runestone.teamone.robotcontrol.command.Command;
 import se.uu.it.runestone.teamone.robotcontrol.command.CommandFactory;
 import se.uu.it.runestone.teamone.scheduler.Job;
+import se.uu.it.runestone.teamone.scheduler.Scheduler;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -19,14 +20,18 @@ import java.util.HashMap;
  *
  * @author Åke Lagercrantz
  */
-public class Dispatch {
+public class Dispatch implements Runnable {
 
     private Room room;
     private PathFinder pathFinder;
+    private Scheduler scheduler;
+    private Robot robot;
 
-    private HashMap<Robot, Node> robotPositions;
+    private Boolean manualMode;
+    private Node manualDestination;
 
-    private HashMap<Robot, ArrayList<Command>> operations;
+    private Boolean abortCurrentJob;
+    private Boolean executing;
 
     /**
      * The designated initializer. Creates a new dispatch.
@@ -34,9 +39,53 @@ public class Dispatch {
      * @param room       The warehouse to navigate when executing a job.
      * @param pathFinder The pathfinder to use when executing a job.
      */
-    public Dispatch(Room room, PathFinder pathFinder) {
+    public Dispatch(Robot robot, Room room, PathFinder pathFinder, Scheduler scheduler) {
         this.room = room;
         this.pathFinder = pathFinder;
+        this.scheduler = scheduler;
+        this.robot = robot;
+
+        this.executing = false;;
+        this.abortCurrentJob = false;
+        this.manualMode = false;
+        this.manualDestination = null;
+    }
+
+    @Override
+    public void run() {
+        Job job;
+
+        System.out.println("Dispatch - Running main loop.");
+
+        while (true) {
+            if (this.manualMode && this.manualDestination != null) {
+                System.out.println("Dispatch - Starting manual job with destination (" +
+                        this.manualDestination.getX().toString() + ", " + this.manualDestination.getY().toString() + ").");
+
+                this.dispatch(this.robot, this.manualDestination);
+            } else if (!this.manualMode && (job = scheduler.nextJob()) != null) {
+                System.out.println("Dispatch - Starting next job in queue.");
+
+                this.dispatch(this.robot, job);
+            } else {
+                try {
+                    Thread.sleep(200);
+                } catch (Exception e) { }
+            }
+        }
+    }
+
+    /**
+     * Sets the robot in manual mode and navigates to
+     * destination node.
+     *
+     * @param destination The destination to navigate to.
+     */
+    public void setManualMode(Node destination) {
+        System.out.println("Dispatch - Entering manual mode.");
+        this.manualMode = true;
+        this.manualDestination = destination;
+        this.abortCurrentJob = true;
     }
 
     /**
@@ -46,19 +95,79 @@ public class Dispatch {
      *
      * @param robot The robot to dispatch.
      * @param job   The job to execute.
-     *
-     * @return The robot when the job is executed.
      */
-    public Robot dispatch(Robot robot, Job job, Node currentPosition, Room.Direction currentDirection) {
+    private void dispatch(Robot robot, Job job) {
         @SuppressWarnings({"unchecked"}) // We know the return type will be ArrayList<Node> since we supply the nodes ourselves.
-        ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPathToNodeMatchingRequirements(currentPosition, job.goods.getRequirements(), this.room);
+        ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPathToNodeMatchingRequirements(robot.getCurrentPosition(), job.goods.getRequirements(), this.room);
 
-        ArrayList<Command> commands = CommandFactory.commandsFromPath(path, currentDirection);
-        this.operations.put(robot, commands);
+        ArrayList<Command> commands = CommandFactory.commandsFromPath(path, robot.getCurrentDirection());
 
-        // TODO: Execute operations one by one asynchronously and wait for completion.
+        this.executeCommands(robot, commands);
+    }
 
-        return robot;
+    /**
+     * Dispatches a robot to navigate to a destination.
+     *
+     * @param robot         The robot to dispatch.
+     * @param destination   The destination to navigate to.
+     */
+    private void dispatch(Robot robot, Node destination) {
+        @SuppressWarnings({"unchecked"}) // We know the return type will be ArrayList<Node> since we supply the nodes ourselves.
+        ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPath(robot.getCurrentPosition(), destination, this.room);
+
+        ArrayList<Command> commands = CommandFactory.commandsFromPath(path, robot.getCurrentDirection());
+
+        this.executeCommands(robot, commands);
+    }
+
+    /**
+     * Executes commands on the robot synchronously.
+     *
+     * Note: Blocking.
+     *
+     * @param robot     The robot to execute on.
+     * @param commands  The commands to execute.
+     *
+     * @return Whether the commands were executed successfully.
+     */
+    private Boolean executeCommands(Robot robot, ArrayList<Command> commands) {
+        if (this.executing) {
+            System.out.println("Dispatch - Already executing. Not taking on new commands.");
+            return false;
+        }
+
+        this.executing = true;
+        this.abortCurrentJob = false;
+
+        System.out.println("Dispatch - Preparing to execute " + commands.size() + " commands.");
+
+        for (int i = 0; i < commands.size(); i++) {
+            if (this.abortCurrentJob) {
+                System.out.println("Dispatch - aborting current job.");
+                this.abortCurrentJob = false;
+                this.executing = false;
+                return false;
+            }
+
+            Command command = commands.remove(0);
+
+            while (true) {
+                if (this.robot.setCurrentCommand(command)) {
+                    System.out.println("Dispatch - Executing command \"" + command.toString() + "\"");
+                    break;
+                } else {
+                    try {
+                        Thread.sleep(200);
+                    } catch (Exception e) { }
+                }
+            }
+        }
+
+        this.executing = false;
+        this.manualDestination = null;
+        System.out.println("Dispatch - Execution complete.");
+
+        return true;
     }
 
 }

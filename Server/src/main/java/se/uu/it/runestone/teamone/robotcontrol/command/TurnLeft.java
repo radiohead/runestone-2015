@@ -29,4 +29,8 @@ public class TurnLeft extends TurnCommand {
         }
     }
 
+    @Override
+    public String toString() {
+        return "turn left";
+    }
 }

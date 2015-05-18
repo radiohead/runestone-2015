@@ -16,5 +16,5 @@ public interface PrioritySupplier {
      *
      * @return An integer representing the priority of this frontier node compared to others.
      */
-    public int priority(int cost, PathFindingNode node);
+    int priority(int cost, PathFindingNode node);
 }
