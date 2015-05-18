@@ -33,8 +33,12 @@ public class Room implements PathFindingGraph {
 
 	private ArrayList<Node> node;
 	private ArrayList<Sensor> sensorList;
-    private ArrayList<ArrayList<Node>> quadrant;
-	private int dimX;
+    private ArrayList<Node> quadrant1;
+    private ArrayList<Node> quadrant2;
+    private ArrayList<Node> quadrant3;
+    private ArrayList<Node> quadrant4;
+    private ArrayList<ArrayList<Node>> quadrant = new ArrayList<ArrayList<Node>>();
+    private int dimX;
 	private int dimY;
 	private int id;
 	public int getIdentity() {
@@ -46,12 +50,17 @@ public class Room implements PathFindingGraph {
     }
 
 	public Room(int xs, int ys/*, ArrayList<Sensor> sensorList*/){
-        Sensor sensor1 = new Sensor("201412120332",new Coordinate(0,0));
-        Sensor sensor2 = new Sensor("344DF7A812A0",new Coordinate(0,this.getDimY()));
-        Sensor sensor3 = new Sensor("344DF7A812A0",new Coordinate(this.getDimX(), this.getDimY()));
+        Sensor sensor1 = new Sensor("/dev/tty.HC-06-DevB",new Coordinate(0,0));
+        Sensor sensor2 = new Sensor("/dev/tty.HC-06-DevB",new Coordinate(0,this.getDimY()));
+        Sensor sensor3 = new Sensor("/dev/tty.HC-06-DevB",new Coordinate(this.getDimX(), this.getDimY()));
+        sensorList = new ArrayList<Sensor>();
         sensorList.add(sensor1);
         sensorList.add(sensor2);
         sensorList.add(sensor3);
+        this.quadrant.add(this.quadrant1);
+        this.quadrant.add(this.quadrant2);
+        this.quadrant.add(this.quadrant3);
+        this.quadrant.add(this.quadrant4);
 
         if(!(xs >= 0 && ys >= 0 ))
             System.out.println("Room cannot be this small.");
@@ -65,11 +74,7 @@ public class Room implements PathFindingGraph {
 
 		this.dimX=xs;
 		this.dimY=ys;
-        if(this.assignNodes()){
-            System.out.println("Room - Sensor assignment completed..");
-        } else {
-            System.out.println("Room - No sensors, aborting assignment of nodes.");
-        }
+
         //sensorList = new ArrayList<Sensor>();
         node = new ArrayList<Node>();
         Node temp = null;
@@ -84,6 +89,11 @@ public class Room implements PathFindingGraph {
                 this.node.add(temp);
             }
 		}
+        if(this.assignNodes()){
+            System.out.println("Room - Sensor assignment completed..");
+        } else {
+            System.out.println("Room - No sensors, aborting assignment of nodes.");
+        }
 	}
     public Boolean assignNodes(){
         if(this.sensorList == null){
@@ -92,10 +102,10 @@ public class Room implements PathFindingGraph {
         int midx = this.getDimX() % 2;
         int midy = this.getDimY() % 2;
 
-        ArrayList<Node> quadrant1 = new ArrayList<Node>();
-        ArrayList<Node> quadrant2 = new ArrayList<Node>();
-        ArrayList<Node> quadrant3 = new ArrayList<Node>();
-        ArrayList<Node> quadrant4 = new ArrayList<Node>();
+        this.quadrant1 = new ArrayList<Node>();
+        this.quadrant2 = new ArrayList<Node>();
+        this.quadrant3 = new ArrayList<Node>();
+        this.quadrant4 = new ArrayList<Node>();
 
         for(Node n : this.node){
             if(n.getX() <= midx && n.getX() > 0){
@@ -114,10 +124,6 @@ public class Room implements PathFindingGraph {
                 }
             }
         }
-        this.quadrant.add(1,quadrant1);
-        this.quadrant.add(2,quadrant2);
-        this.quadrant.add(3,quadrant3);
-        this.quadrant.add(4,quadrant4);
         return true;
     }
 
@@ -295,7 +301,7 @@ public class Room implements PathFindingGraph {
         avgL = avgL/3;
         avgH = avgH/3;
         // Fourth quadarant without sensor, all nodes set to average.
-        for(Node n : quadrant.get(sensorList.size()+1)){
+        for(Node n : this.quadrant4){
             n.update(avgH,avgL,avgT);
         }
 
