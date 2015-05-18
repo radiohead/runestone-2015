@@ -21,6 +21,19 @@
         <servlet-name>GotoServlet</servlet-name>
         <servlet-class>GotoServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ReleaseServlet</servlet-name>
+        <servlet-class>ReleaseServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ScheduleServlet</servlet-name>
+        <servlet-class>ScheduleServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>BookServlet</servlet-name>
+        <servlet-class>BookServlet</servlet-class>
+    </servlet>
 
 
     <!-- All servlets mappings -->
@@ -40,6 +53,20 @@
         <servlet-name>GotoServlet</servlet-name>
         <url-pattern>/goto</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReleaseServlet</servlet-name>
+        <url-pattern>/release</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ScheduleServlet</servlet-name>
+        <url-pattern>/schedule</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>BookServlet</servlet-name>
+        <url-pattern>/book</url-pattern>
+    </servlet-mapping>
+
 
 
 </web-app>

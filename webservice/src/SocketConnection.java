@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
 public class SocketConnection {
     public static String fetch(String message) {
         /** Define a host server and port */
-        String host = "130.243.197.197";
+        String host = "127.0.0.1";
         int port = 4444;
 
         StringBuffer instr = new StringBuffer();
