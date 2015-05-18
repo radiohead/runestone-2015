@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import se.uu.it.runestone.teamone.map.Coordinate;
 import se.uu.it.runestone.teamone.map.Node;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
@@ -31,11 +32,29 @@ public class Sensor extends Thread implements SerialPortEventListener{
 	SerialPort connection = null;
 	Node node = null;
     private BufferedReader input = null;
-    private OutputStream output = null;	
-    
-	public Sensor(String sensor, Node node){
+    private OutputStream output = null;
+	private Coordinate placement;
+	private Double humidity;
+	private Double light;
+
+    public Double getTemperature() {
+        return temperature;
+    }
+
+    public Double getLight() {
+        return light;
+    }
+
+    public Double getHumidity() {
+        return humidity;
+    }
+
+    private Double temperature;
+
+
+	public Sensor(String sensor, Coordinate placement){
 		this.sensorName = sensor;
-		this.node = node;
+		this.placement = placement;
 	}
 	
 	private Boolean init(){
@@ -94,7 +113,10 @@ public class Sensor extends Thread implements SerialPortEventListener{
                     // These should be parsed from sensor message.
                     values = parseClimate(inputLine);
                     if(values.size() >= 3) {
-                        this.updateNode(values.get(1), values.get(2), values.get(3));
+						this.humidity = (values.get(3));
+                        this.light = (values.get(1));
+                        this.temperature = (values.get(2));
+
                     } else{
                         System.out.println("Too few values parsed from sensor.");
                     }
@@ -110,9 +132,6 @@ public class Sensor extends Thread implements SerialPortEventListener{
         }
     }
 
-	public void updateNode(double humidity, double light, double temperature) {
-		//this.node.update(humidity, light, temperature);
-	}
 	private ArrayList<Double> parseClimate(String contents){
 			ArrayList < Double > result = new ArrayList < Double >();
 			Matcher m = Pattern.compile( "(?<!R)[-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?" ).matcher(contents);
@@ -125,5 +144,7 @@ public class Sensor extends Thread implements SerialPortEventListener{
 
 			return result;
     }
+	public Integer getX(){ return this.placement.getX();}
+	public Integer getY(){ return this.placement.getY();}
 }
 	

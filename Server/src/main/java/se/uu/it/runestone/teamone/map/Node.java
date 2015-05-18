@@ -11,23 +11,24 @@ import java.util.ArrayList;
 
 public class Node implements PathFindingNode{
 	private int x = -1, y = -1;
+    private Coordinate placement=null;
 	private Boolean visited;
 	private Boolean obstructed;
 
     public double temp = -1;
     public double light = -1;
     public double humidity = -1;
+
 	
-	public Node (int x, int y, Boolean obstructed) {
-			this.x = x;
-			this.y = y;
+	public Node (Coordinate placement, Boolean obstructed) {
+	        this.placement  = placement;
             this.setObstructed(obstructed);
             this.setVisited(false);
 		}
 	@Override public Integer getX(){
-		return this.x;
+		return this.placement.getX();
 	}
-	@Override public Integer getY() { return this.y; }
+	@Override public Integer getY() { return this.placement.getY(); }
 
 	public Boolean equals(PathFindingNode otherPosition){
 		return (otherPosition.getX() == this.getX() && otherPosition.getY() == this.getY());
@@ -62,7 +63,7 @@ public class Node implements PathFindingNode{
         }
     }
 
-    public void update(double humidity, double light, double temperature) {
+    public void update(Double humidity, Double light, Double temperature) {
 		this.humidity = humidity;
 		this.light = light;
 		this.temp = temperature;

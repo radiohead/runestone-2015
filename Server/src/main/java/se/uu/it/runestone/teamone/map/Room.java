@@ -1,13 +1,11 @@
 package se.uu.it.runestone.teamone.map;
 
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.logging.Logger;
 
 import se.uu.it.runestone.teamone.pathfinding.PathFindingGraph;
 import se.uu.it.runestone.teamone.pathfinding.PathFindingNode;
 import se.uu.it.runestone.teamone.pathfinding.PathFindingRequirements;
-import se.uu.it.runestone.teamone.climate.*;
+import se.uu.it.runestone.teamone.climate.Sensor;
 
 /**
  * A class implementing map representation of the storage facility.
@@ -35,27 +33,93 @@ public class Room implements PathFindingGraph {
 
 	private ArrayList<Node> node;
 	private ArrayList<Sensor> sensorList;
+    private ArrayList<ArrayList<Node>> quadrant;
 	private int dimX;
 	private int dimY;
+	private int id;
+	public int getIdentity() {
+        return this.id;
+    }
 
-	public Room(int xs, int ys){
+    public void setIdentity(int id) {
+        this.id = id;
+    }
+
+	public Room(int xs, int ys/*, ArrayList<Sensor> sensorList*/){
+        Sensor sensor1 = new Sensor("201412120332",new Coordinate(0,0));
+        Sensor sensor2 = new Sensor("344DF7A812A0",new Coordinate(0,this.getDimY()));
+        Sensor sensor3 = new Sensor("344DF7A812A0",new Coordinate(this.getDimX(), this.getDimY()));
+        sensorList.add(sensor1);
+        sensorList.add(sensor2);
+        sensorList.add(sensor3);
+
+        if(!(xs >= 0 && ys >= 0 ))
+            System.out.println("Room cannot be this small.");
+        if(sensorList != null){
+            for(Sensor sensor : sensorList){
+                if(!(sensor.getX() <= xs && sensor.getY() <=ys))
+                    System.out.println("Sensor outside grid.");
+            }
+            this.sensorList = sensorList;
+        }
+
 		this.dimX=xs;
 		this.dimY=ys;
-        sensorList = new ArrayList<Sensor>();
+        if(this.assignNodes()){
+            System.out.println("Room - Sensor assignment completed..");
+        } else {
+            System.out.println("Room - No sensors, aborting assignment of nodes.");
+        }
+        //sensorList = new ArrayList<Sensor>();
         node = new ArrayList<Node>();
         Node temp = null;
 		for(int i=0;i<ys;i++){
 			for(int j=0;j<xs;j++){
                 if ((j == 2 && i != this.getDimY() % 8 ) || ( j == 6 && i != this.getDimY()-4) ){
-                    temp = new Node(j,i,true);
                     System.out.println("Room - Setting ["+j+","+i+"] to obstructed");
+                    temp = new Node(new Coordinate(j,i),true);
                 } else {
-                    temp = new Node(j,i,false);
+                    temp = new Node(new Coordinate(j,i),false);
                 }
                 this.node.add(temp);
             }
 		}
 	}
+    public Boolean assignNodes(){
+        if(this.sensorList == null){
+            return false;
+        }
+        int midx = this.getDimX() % 2;
+        int midy = this.getDimY() % 2;
+
+        ArrayList<Node> quadrant1 = new ArrayList<Node>();
+        ArrayList<Node> quadrant2 = new ArrayList<Node>();
+        ArrayList<Node> quadrant3 = new ArrayList<Node>();
+        ArrayList<Node> quadrant4 = new ArrayList<Node>();
+
+        for(Node n : this.node){
+            if(n.getX() <= midx && n.getX() > 0){
+                // Left-side
+                if(n.getY() <= midy){
+                    quadrant1.add(n);
+                } else {
+                    quadrant2.add(n);
+                }
+            } else if(n.getX() < this.getDimX() && n.getX() > midx){
+                // Right-side
+                if(n.getY() <= midy){
+                    quadrant4.add(n);
+                } else {
+                    quadrant3.add(n);
+                }
+            }
+        }
+        this.quadrant.add(1,quadrant1);
+        this.quadrant.add(2,quadrant2);
+        this.quadrant.add(3,quadrant3);
+        this.quadrant.add(4,quadrant4);
+        return true;
+    }
 
 	public int getDimY() {
 		return dimY;
@@ -66,6 +130,8 @@ public class Room implements PathFindingGraph {
 	public void setX(int newX){
 		this.dimX = newX;
 	}
+    public ArrayList<Node> getNode(){return node;}
+    public ArrayList<Sensor> getSensorList(){return sensorList;}
 
 
     public Node nodeFromCoordinates(Integer x, Integer y) {
@@ -168,8 +234,6 @@ public class Room implements PathFindingGraph {
         //System.out.println(this);
     }
 
-	//// Printing ////
-
 	@Override
 	public String toString() {
 		return this.toString(null);
@@ -198,11 +262,70 @@ public class Room implements PathFindingGraph {
 		return map;
 	}
 
+    /**
+     * Call this method to force climate update
+     * along all nodes in the grid.
+     * @param propagationDrop
+     */
+    public void propagateClimate(Double propagationDrop){
+        if(propagationDrop >= 1 && propagationDrop <= 0.01)
+            return; // Diminishing return must be less then 100% and more 1% for each tile
+        /* Somehow we need to know what nodes
+           a sensor is responsible for updating.
+           Perhaps a method assigns nodes to a
+           sensor when room is initiated.
 
-	private void updateTemp(){
-		for(Sensor sensor : this.sensorList){
-			// Used to retrieve data form sensor.
-		}
+           Then this method only runs through
+           sensor.nodes and attaches a new
+           climate value that is sensor-value
+           * distance * propagationDrop.
+           Maybe we could use the visited flag
+           to iterate through the nodes making
+           and making sure they have been assigned
+           to a sensor. Not sure this is time-efficient
+           but at least it seems feasible.
+         */
+        double avgT=0, avgL=0, avgH=0;
+        for(Sensor s : sensorList){
+            avgT += s.getTemperature();
+            avgH += s.getHumidity();
+            avgL += s.getLight();
+        }
+        avgT = avgT/3;
+        avgL = avgL/3;
+        avgH = avgH/3;
+        // Fourth quadarant without sensor, all nodes set to average.
+        for(Node n : quadrant.get(sensorList.size()+1)){
+            n.update(avgH,avgL,avgT);
+        }
+
+        // Other nodes updated dynamically to average conditions.
+        for(int i = 1;i<=sensorList.size();i++){
+            for(Node node : quadrant.get(i)){
+                updateClimate(sensorList.get(i),node, avgH, avgL, avgT, propagationDrop);
+            }
+        }
+
+    }
+
+    /**
+     * Will update temperature of Node in relation to average temperature and distance to sensor.
+     * @param sensor
+     * @param node
+     * @param refHumidity
+     * @param refLight
+     * @param refTemperature
+     * @param factor
+     */
+	public void updateClimate(Sensor sensor, Node node, Double refHumidity, Double refLight, Double refTemperature, Double factor){
+        Double sHumidity = sensor.getHumidity();
+        Double sLight = sensor.getLight();
+        Double sTemp = sensor.getTemperature();
+        int distance  = this.distance(this.nodeFromCoordinates(sensor.getX(), sensor.getY()),node);
+        if(distance == 0) { node.humidity= sHumidity; node.light = sLight;node.temp = sTemp; return;}
+        node.humidity -= (sHumidity - refHumidity)*factor;
+        node.light -= (sLight - refLight)*factor;
+        node.temp -= (sTemp - refTemperature)*factor;
+        return;
 	}
-
 }
