@@ -7,25 +7,25 @@ import java.io.PrintWriter;
 /**
  * Created by Lelli on 15/05/15.
  */
-public class GotoServlet extends HttpServlet {
+public class ScheduleServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String x = request.getParameter("x");
-        String y = request.getParameter("y");
         PrintWriter out = response.getWriter();
-
-        if(!(isNumeric(x) && isNumeric(y))){
+        String temp = request.getParameter("temp");
+        String light = request.getParameter("light");
+        String size = request.getParameter("size");
+        //Check that the temp/light inputs are doubles
+        if(!(isNumeric(temp) && isNumeric(light) && isNumeric(size))){
             out.println("false");
         }
         else{
-            out.println(SocketConnection.fetch("goto," + x +"," + y));
+            out.println(SocketConnection.fetch("goto," + temp +"," + light +"," + size));
         }
     }
-
     public static boolean isNumeric(String str)
     {
         try
         {
-            int i = Integer.parseInt(str);
+            double d = Double.parseDouble(str);
         }
         catch(NumberFormatException nfe)
         {
