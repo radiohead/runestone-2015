@@ -2,8 +2,6 @@ package se.uu.it.runestone.teamone.robotcontrol.command;
 
 import se.uu.it.runestone.teamone.map.Room;
 
-import javax.validation.constraints.NotNull;
-
 /**
  * Represents a turn command that can be sent to the robot.
  *
@@ -20,7 +18,6 @@ public abstract class TurnCommand extends Command {
      *
      * @return The direction after execution.
      */
-    @NotNull
     public abstract Room.Direction directionAfterExecution(Room.Direction initialDirection);
 
 }
