@@ -73,7 +73,7 @@ public class Sensor extends Thread implements SerialPortEventListener{
 			this.requestData();
             System.out.println("Sensor"+identity +" - Connection established.");
 		} catch(Exception e){
-			System.out.println("Sensor"+identity+" - Failed to open connection to " + this.sensorName + ", " + e.getMessage());
+			System.out.println("Sensor" + identity + " - Failed to open connection to " + this.sensorName + ", " + e.getMessage());
             Thread.sleep(5000);
 		}
 		return !(this.connection == null);
@@ -97,7 +97,9 @@ public class Sensor extends Thread implements SerialPortEventListener{
 		try{
             init();
         } catch (InterruptedException ie){ ie.printStackTrace();}
-		while(running){}
+		while(running){
+            // Keep on runnin' :)
+        }
 		this.close();
 	}
 
@@ -107,7 +109,7 @@ public class Sensor extends Thread implements SerialPortEventListener{
 
 	@Override
 	public synchronized void serialEvent(SerialPortEvent oEvent) {
-		ArrayList<Double> values = new ArrayList<Double>();
+		ArrayList<Double> values;// = new ArrayList<>();
 		//System.out.println("Event received: " + oEvent.toString());
 		try {
 			switch (oEvent.getEventType() ) {
@@ -118,7 +120,8 @@ public class Sensor extends Thread implements SerialPortEventListener{
 										connection.getInputStream()));
 					}
 					String inputLine = input.readLine();
-					//System.out.println("Sensor"+identity+" - Incoming <- " + inputLine);
+					System.out.println("\nSensor"+identity+" - Received: ========================================= \n "
+                            + inputLine + "\n=============================================================");
 					// These should be parsed from sensor message.
 					values = parseClimate(inputLine);
 					if(values.size() >= 3) {
@@ -144,7 +147,7 @@ public class Sensor extends Thread implements SerialPortEventListener{
 	}
 
 	public ArrayList<Double> parseClimate(String contents){
-		ArrayList < Double > result = new ArrayList < Double >();
+		ArrayList < Double > result = new ArrayList < >();
 		Matcher m = Pattern.compile( "(?<!R)[-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?" ).matcher(contents);
 
 		while ( m.find() )
