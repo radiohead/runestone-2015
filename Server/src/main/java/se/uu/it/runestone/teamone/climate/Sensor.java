@@ -31,7 +31,9 @@ public class Sensor extends Thread implements SerialPortEventListener{
 
 	String sensorName = null;
 	SerialPort connection = null;
+	private Boolean running = true;
 	Node node = null;
+    private int identity;
 	private BufferedReader input = null;
 	private OutputStream output = null;
 	private Coordinate placement;
@@ -47,30 +49,32 @@ public class Sensor extends Thread implements SerialPortEventListener{
 		return light;
 	}
 
-	public Double getHumidity() {
-		return humidity;
-	}
+	public Double getHumidity() { return humidity; }
 
-	public Sensor(String sensor, Coordinate placement){
+	public Sensor(int identity, String sensor, Coordinate placement){
 		this.sensorName = sensor;
 		this.placement = placement;
+        this.identity = identity;
 	}
 
-	private Boolean init(){
+	private Boolean init() throws InterruptedException{
 		try{
 			CommPortIdentifier port = CommPortIdentifier.getPortIdentifier(sensorName);
 			SerialPort handle = (SerialPort) port.open("whyBother?",TIME_OUT);
 			if(handle != null){
 				this.connection = handle;
 			}
-			this.connection.setSerialPortParams(BAUD_RATE,SerialPort.DATABITS_8,
-					SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
+			this.connection.setSerialPortParams(BAUD_RATE, SerialPort.DATABITS_8,
+                    SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 			this.connection.addEventListener(this);
 			this.connection.notifyOnDataAvailable(true);
-			System.out.println("Sensor - Waiting for connection.");
+			//System.out.println("Sensor"+identity+" - Waiting for connection.");
 			Thread.sleep(2000);
+			this.requestData();
+            System.out.println("Sensor"+identity +" - Connection established.");
 		} catch(Exception e){
-			System.out.println("Sensor - Failed to open connection to " + this.sensorName + ", " + e.getMessage());
+			System.out.println("Sensor"+identity+" - Failed to open connection to " + this.sensorName + ", " + e.getMessage());
+            Thread.sleep(5000);
 		}
 		return !(this.connection == null);
 	}
@@ -89,8 +93,12 @@ public class Sensor extends Thread implements SerialPortEventListener{
 	}
 
 	public void run(){
-		System.out.println("Sensor - initating.");
-		init();
+		System.out.println("Sensor"+identity+" - initating.");
+		try{
+            init();
+        } catch (InterruptedException ie){ ie.printStackTrace();}
+		while(running){}
+		this.close();
 	}
 
 	public void close(){
@@ -110,7 +118,7 @@ public class Sensor extends Thread implements SerialPortEventListener{
 										connection.getInputStream()));
 					}
 					String inputLine = input.readLine();
-					System.out.println("Sensor - Incoming <- " + inputLine);
+					//System.out.println("Sensor"+identity+" - Incoming <- " + inputLine);
 					// These should be parsed from sensor message.
 					values = parseClimate(inputLine);
 					if(values.size() >= 3) {
@@ -120,13 +128,13 @@ public class Sensor extends Thread implements SerialPortEventListener{
 						this.temperature = (values.get(1));
 
 					} else{
-						System.out.println("Sensor - Too few values parsed from sensor.");
+						System.out.println("Sensor"+identity+" - Too few values parsed from sensor.");
 					}
 
 					break;
 
 				default:
-					System.out.println("Sensor - Incoming <- No data available.");
+					System.out.println("Sensor"+identity+" - Incoming <- No data available.");
 					break;
 			}
 		}

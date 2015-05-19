@@ -50,9 +50,27 @@ public class Room implements PathFindingGraph {
     }
 
 	public Room(int xs, int ys/*, ArrayList<Sensor> sensorList*/){
-        Sensor sensor1 = new Sensor("/dev/tty.HC-06-DevB",new Coordinate(0,0));
-        Sensor sensor2 = new Sensor("/dev/tty.HC-06-DevB",new Coordinate(0,this.getDimY()));
-        Sensor sensor3 = new Sensor("/dev/tty.HC-06-DevB",new Coordinate(this.getDimX(), this.getDimY()));
+        Sensor sensor1 = new Sensor(1,"/dev/tty.HC-06-DevB",new Coordinate(0,0));
+        Sensor sensor2 = new Sensor(2,"/dev/tty.HC-06-DevB-1",new Coordinate(0,this.getDimY()));
+        Sensor sensor3 = new Sensor(3,"/dev/tty.HC-06-DevB-2",new Coordinate(this.getDimX(), this.getDimY()));
+
+        Thread thread = new Thread(){
+            public void run(){
+                System.out.println("Thread Running");
+                Thread t1 = new Thread(sensor1);
+                Thread t2 = new Thread(sensor2);
+                Thread t3 = new Thread(sensor3);
+                t1.start();
+                t2.start();
+                t3.start();
+                try {
+                    Thread.sleep(15000);
+                } catch(Exception e){e.printStackTrace();}
+            }
+        };
+
+        thread.start();
+
         sensorList = new ArrayList<Sensor>();
         sensorList.add(sensor1);
         sensorList.add(sensor2);
