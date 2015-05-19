@@ -2,8 +2,6 @@ package se.uu.it.runestone.teamone.robotcontrol.command;
 
 import se.uu.it.runestone.teamone.map.Room;
 
-import javax.validation.constraints.NotNull;
-
 /**
  * Represents a command that tells the robot to turn left 90 degrees.
  *
@@ -11,7 +9,6 @@ import javax.validation.constraints.NotNull;
  */
 public class TurnLeft extends TurnCommand {
 
-    @NotNull
     @Override
     public Room.Direction directionAfterExecution(Room.Direction initialDirection) {
         switch (initialDirection) {
