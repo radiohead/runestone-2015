@@ -116,7 +116,8 @@ public class RobotClient {
         return command;
       }
       catch (IOException e) {
-        RobotClient.drawLCDString("Failed to fetch command, need to restart");
+        RobotClient.drawLCDString("Failed to fetch command");
+        RobotClient.drawLCDString("Send command again");
         return "";
       }
     }
