@@ -1,0 +1,291 @@
+extends layout
+
+block content
+  table
+    tr
+      td
+        table.map
+          - var n = 0
+          while n < 10
+            tr(id='maptr'+n)
+            - var m = 0
+            while m < 10
+              td(id='maptd_'+n+'_'+m, data-x = m, data-y = n)
+              - m++
+            - n++
+      td
+        div.sensorsdata
+          p.sensorid
+          p.sensortemperature
+          p.sensorlight
+        div.controlsdiv(data-robot=0)
+          | CONTROLS
+          table
+            tr
+              td
+              td
+                a.btn.btn-default.controls.disabled(data-action='up') UP
+              td
+            tr
+              td
+                a.btn.btn-default.controls.disabled(data-action='left') LEFT
+              td
+              td
+                a.btn.btn-default.controls.disabled(data-action='right') RIGHT
+            tr
+              td
+              td
+                a.btn.btn-default.controls.disabled(data-action='down') DOWN
+              td
+            tr
+              td
+                a.btn.btn-default.controls.disabled(data-action='rotate_left') ROTATE LEFT
+              td
+                a.btn.btn-default.controls.disabled(data-action='rotate_right') ROTATE RIGHT
+              td
+          a.btn.btn-default.startmanual START MANUAL
+          a.btn.btn-default.stopmanual STOP MANUAL
+  div.hiddensensordata(style='display: none;')
+
+
+  script.
+    var controls = $('.controlsdiv');
+
+    var sensors = [{x:0,y:0},{x:0,y:9},{x:9,y:0},{x:9,y:9}];
+    var robots = [{manual: false, x:0, y:0, rotated: 'up'}];
+    var selected_sensor = null;
+
+    var put_sensors = function () {
+      for (var i in sensors) {
+        $('#maptd_' + sensors[i].y + '_' + sensors[i].x).html('<div id="sensorarea'+i+'" data-sensor="'+i+'" class="sensorarea"></div>');
+      }
+    }
+
+    put_sensors();
+
+    $('#maptd_5_5').html('<div id="robot_1" class="robot left_right" data-robot="1"></div>');
+    $('.stopmanual').hide();
+    controls.hide();
+
+    $('.map').on('click', '.robot', function(){
+      //- alert('robot');
+      controls.attr('data-robot', $(this).attr('data-robot'));
+      $(this).addClass('selected');
+      controls.show();
+    });
+
+    $('.startmanual').on('click', function() {
+
+      $.getJSON('/robot/manual/true', function (response) {
+        if (response.complete) {
+          $('.controls').each(function( index ) {
+            $(this).removeClass('disabled');
+          });
+          $('.stopmanual').show();
+          $('.startmanual').hide();
+          robots[0].manual = true;
+        }
+      });
+
+    });
+
+    $('.stopmanual').on('click', function() {
+
+      $.getJSON('/robot/manual/false', function (response) {
+        if (response.complete) {
+          $('.controls').each(function( index ) {
+            $(this).addClass('disabled');
+          });
+          $('.startmanual').show();
+          $('.stopmanual').hide();
+          robots[0].manual = false;
+        }
+      });
+
+
+    });
+
+    $('.map').on('click', '.sensorarea', function() {
+      var sensorid = $(this).attr('data-sensor');
+      $('.sensorid').text('Sensor ID: ' + $(this).attr('data-sensor'));
+      $('.sensortemperature').text('Temperature: ' + sensors[sensorid].temperature);
+      $('.sensorlight').text('Light: ' + sensors[sensorid].light);
+      $('.sensorarea').each(function( index ) {
+        $(this).removeClass('selected');
+      });
+      $(this).addClass('selected');
+      selected_sensor = $(this).attr('id');
+    });
+
+    $('.controls').on('click', function() {
+      var robot_id = controls.attr('data-robot');
+      var robot = $('#robot_' + robot_id);
+      var action = $(this).attr('data-action');
+
+      var container = robot.parent();
+      var x = container.attr('data-x');
+      var y = container.attr('data-y');
+      var moved = false;
+      var new_rotated = '';
+      var rotated = '';
+      var old_rotated = 'up_down';
+      if (robot.hasClass("left_right")) {
+        old_rotated = 'left_right';
+      }
+
+      switch (action) {
+        case 'up':
+          if (y > 0) {
+            y--;
+            new_rotated = 'up_down';
+            moved = true;
+            robots[0].rotated = 'up';
+          }
+          break;
+        case 'down':
+          if (y < 9) {
+            y++;
+            new_rotated = 'up_down';
+            moved = true;
+            robots[0].rotated = 'down';
+          }
+          break;
+        case 'left':
+          if (x > 0) {
+            x--;
+            new_rotated = 'left_right';
+            moved = true;
+            robots[0].rotated = 'left';
+          }
+          break;
+        case 'right':
+          if (x < 9) {
+            x++;
+            new_rotated = 'left_right';
+            moved = true;
+            robots[0].rotated = 'right';
+          }
+          break;
+        case 'rotate_left':
+          switch (robots[0].rotated) {
+            case 'up':
+              robots[0].rotated = 'left';
+              break;
+            case 'down':
+              robots[0].rotated = 'right';
+              break;
+            case 'left':
+              robots[0].rotated = 'down';
+              break;
+            case 'right':
+              robots[0].rotated = 'up';
+              break;
+          }
+          if (old_rotated == 'left_right') {
+            new_rotated = 'up_down';
+          } else {
+            new_rotated = 'left_right';
+          }
+          moved = true;
+          break;
+        case 'rotate_right':
+          switch (robots[0].rotated) {
+            case 'up':
+              robots[0].rotated = 'right';
+              break;
+            case 'down':
+              robots[0].rotated = 'left';
+              break;
+            case 'left':
+              robots[0].rotated = 'up';
+              break;
+            case 'right':
+              robots[0].rotated = 'down';
+              break;
+          }
+          if (old_rotated == 'left_right') {
+            new_rotated = 'up_down';
+          } else {
+            new_rotated = 'left_right';
+          }
+          moved = true;
+          break;
+      }
+      if (moved) {
+        robots[0].x = x;
+        robots[0].y = y;
+
+        $.ajax({
+          type: 'POST',
+          url: '/robot/move',
+          data: robots[0],
+          success: function(data, textStatus, jqXHR) {
+            if (data.complete) {
+              $('#maptd_' + y + '_' + x).html(robot);
+              if (new_rotated != '') {
+                robot.removeClass(old_rotated);
+                robot.addClass(new_rotated);
+              }
+              var sensorarea = false;
+              for (var i in sensors) {
+                if (x == sensors[i].x && y == sensors[i].y) {
+                  sensorarea = true;
+                }
+              }
+
+              if (!sensorarea) {
+                put_sensors();
+                if (selected_sensor != null) {
+                  $('#'+selected_sensor).addClass('selected');
+                }
+              }
+            }
+          }
+        });
+
+      }
+
+    });
+
+    var pollServerForData = function () {
+      $.getJSON('/sensordata', function (response) {
+        if (response) {
+          $('.hiddensensordata').html(JSON.stringify(response));
+
+          sensors = response.sensors;
+
+          if (robots[0].manual == false) {
+            var robot = $('#robot_1');
+            var robot_data = response.robots[0];
+            if (robot_data.rotated == 'left' || robot_data.rotated == 'right') {
+              robot.removeClass('up_down');
+              robot.addClass('left_right');
+            } else {
+              robot.addClass('up_down');
+              robot.removeClass('left_right');
+            }
+
+            $('#maptd_' + robot_data.y + '_' + robot_data.x).html(robot);
+
+            robots[0] = robot_data;
+
+            var sensorarea = false;
+            for (var i in sensors) {
+              if (robot_data.x == sensors[i].x && robot_data.y == sensors[i].y) {
+                sensorarea = true;
+              }
+            }
+
+            if (!sensorarea) {
+              put_sensors();
+              if (selected_sensor != null) {
+                $('#'+selected_sensor).addClass('selected');
+              }
+            }
+          }
+
+        }
+        setTimeout(pollServerForData, 3000);
+      });
+    };
+    setTimeout(pollServerForData, 3000);

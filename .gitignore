@@ -44,3 +44,6 @@ hs_err_pid*
 #Gradle
 .gradle
 build
+
+node_modules/
+webui/bin
