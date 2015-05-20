@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  table
+  table(style='border-spacing: 10px; border-collapse: separate;')
     tr
       td
         table.map
@@ -14,11 +14,12 @@ block content
               - m++
             - n++
       td
-        div.sensorsdata
+        div.alert.alert-info.sensorsdata
           p.sensorid
+            em select sensor to view sensor data
           p.sensortemperature
           p.sensorlight
-        div.controlsdiv(data-robot=0)
+        div.alert.alert-info.controlsdiv(data-robot=0)
           | CONTROLS
           table
             tr
@@ -43,8 +44,28 @@ block content
               td
                 a.btn.btn-default.controls.disabled(data-action='rotate_right') ROTATE RIGHT
               td
-          a.btn.btn-default.startmanual START MANUAL
+          a.btn.btn-default.startmanual.disabled START MANUAL
           a.btn.btn-default.stopmanual STOP MANUAL
+      td
+        div.alert.alert-info.robotparams(data-robot=0)
+          form
+            .form-group
+              label(for='input_x') X
+              input.form-control#input_x
+            .form-group
+              label(for='input_y') Y
+              input.form-control#input_y
+            .form-group
+              label(for='input_req_temp') Required temperature
+              input.form-control#input_req_temp
+            .form-group
+              label(for='input_req_light') Required light
+              input.form-control#input_req_light
+            .form-group
+              label(for='input_pack_size') Package size
+              input.form-control#input_pack_size
+            a.btn.btn-default.sendrobotdata Change
+
   div.hiddensensordata(style='display: none;')
 
 
@@ -65,12 +86,13 @@ block content
 
     $('#maptd_5_5').html('<div id="robot_1" class="robot left_right" data-robot="1"></div>');
     $('.stopmanual').hide();
-    controls.hide();
+    //- controls.hide();
 
     $('.map').on('click', '.robot', function(){
       //- alert('robot');
       controls.attr('data-robot', $(this).attr('data-robot'));
       $(this).addClass('selected');
+      $('.startmanual').removeClass('disabled');
       controls.show();
     });
 
@@ -244,6 +266,55 @@ block content
         });
 
       }
+
+    });
+
+    $('.sendrobotdata').on('click', function() {
+      var manual = robots[0].manual;
+      robots[0].manual = true;
+
+      var new_robot_data = {
+        x: $('#input_x').val(),
+        y: $('#input_y').val(),
+        req_temp: $('#input_req_temp').val(),
+        req_light: $('#input_req_light').val(),
+        pack_size: $('#input_pack_size').val()
+      }
+
+      for (var i in new_robot_data) {
+        if (new_robot_data[i] === '' || new_robot_data[i] == null) {
+          new_robot_data[i] = robots[0][i];
+        }
+      }
+
+      var robot = $('#robot_1');
+
+      $.ajax({
+        type: 'POST',
+        url: '/robot/move',
+        data: robots[0],
+        success: function(data, textStatus, jqXHR) {
+          if (data.complete) {
+            $('#maptd_' + new_robot_data.y + '_' + new_robot_data.x).html(robot);
+
+            var sensorarea = false;
+            for (var i in sensors) {
+              if (new_robot_data.x == sensors[i].x && new_robot_data.y == sensors[i].y) {
+                sensorarea = true;
+              }
+            }
+
+            robots[0].manual = manual;
+
+            if (!sensorarea) {
+              put_sensors();
+              if (selected_sensor != null) {
+                $('#'+selected_sensor).addClass('selected');
+              }
+            }
+          }
+        }
+      });
 
     });
 

@@ -11,7 +11,10 @@ var robot_data = {
   x: 5,
   y: 5,
   rotated: 'up',
-  manual: false
+  manual: false,
+  req_temp: 20,
+  req_light: 5,
+  pack_size: 0
 };
 
 router.get('/robot/manual/true', function(req, res, next) {
@@ -27,7 +30,12 @@ router.get('/robot/manual/false', function(req, res, next) {
 });
 
 router.post('/robot/move', function(req, res, next) {
+  var manual = robot_data.manual;
   robot_data = req.body;
+  robot_data.x = parseInt(robot_data.x);
+  robot_data.y = parseInt(robot_data.y);
+  robot_data.manual = manual;
+  console.log(robot_data);
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify({complete: true}));
 });
