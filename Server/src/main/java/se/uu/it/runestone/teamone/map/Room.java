@@ -8,7 +8,9 @@ import se.uu.it.runestone.teamone.pathfinding.PathFindingRequirements;
 import se.uu.it.runestone.teamone.climate.Sensor;
 
 /**
- * A class implementing map representation of the storage facility.
+ * A class implementing map representation of the storage
+ * facility. The facility will be of a square or rectangular
+ * shape with the dimensions x and y.
  * 
  * @author Daniel Eliassen
  */
@@ -40,15 +42,21 @@ public class Room implements PathFindingGraph {
     private ArrayList<ArrayList<Node>> quadrant = new ArrayList<ArrayList<Node>>();
     private int dimX;
 	private int dimY;
-	private int id;
+	private int identity;
+
 	public int getIdentity() {
-        return this.id;
+        return this.identity;
     }
-
     public void setIdentity(int id) {
-        this.id = id;
+        this.identity = id;
     }
 
+    /**
+     * Constructor for the Room-class, requires the dimensions
+     * for the room upon instantiation.
+     * @param xs Dimension of the room on the x-axis.
+     * @param ys Dimension of the room on the y-axis.
+     */
 	public Room(int xs, int ys/*, ArrayList<Sensor> sensorList*/){
         Sensor sensor1 = new Sensor(1,"/dev/tty.HC-06-DevB",new Coordinate(0,0));
         Sensor sensor2 = new Sensor(2,"/dev/tty.HC-06-DevB-1",new Coordinate(0,this.getDimY()));
@@ -71,7 +79,7 @@ public class Room implements PathFindingGraph {
 
         thread.start();
 
-        sensorList = new ArrayList<Sensor>();
+        sensorList = new ArrayList<>();
         sensorList.add(sensor1);
         sensorList.add(sensor2);
         sensorList.add(sensor3);
@@ -87,7 +95,6 @@ public class Room implements PathFindingGraph {
                 if(!(sensor.getX() <= xs && sensor.getY() <=ys))
                     System.out.println("Sensor outside grid.");
             }
-            this.sensorList = sensorList;
         }
 
 		this.dimX=xs;
@@ -107,16 +114,21 @@ public class Room implements PathFindingGraph {
                 this.node.add(temp);
             }
 		}
-        if(this.assignNodes()){
+        if(this.sensorList != null){
+            this.assignNodes();
             System.out.println("Room - Sensor assignment completed..");
         } else {
             System.out.println("Room - No sensors, aborting assignment of nodes.");
         }
 	}
-    public Boolean assignNodes(){
-        if(this.sensorList == null){
-            return false;
-        }
+
+    /**
+     * Divides all nodes into four quadrants by splitting
+     * the matrix/grid/room in half on both the x- and
+     * y-axis.
+     */
+    public void assignNodes(){
+
         int midx = this.getDimX() % 2;
         int midy = this.getDimY() % 2;
 
@@ -142,7 +154,7 @@ public class Room implements PathFindingGraph {
                 }
             }
         }
-        return true;
+        return;
     }
 
 	public int getDimY() {
@@ -157,9 +169,20 @@ public class Room implements PathFindingGraph {
     public ArrayList<Node> getNode(){return node;}
     public ArrayList<Sensor> getSensorList(){return sensorList;}
 
-
+    /**
+     * Retreive a node with given coordinates x and y.
+     *
+     * @author Daniel Eliassen
+     *
+     * @param x Location on the x-axis of the node.
+     * @param y Location on the y-axis of the node.
+     *
+     * @return The Node if found null otherwise.
+     */
     public Node nodeFromCoordinates(Integer x, Integer y) {
-        return node.get(this.getDimY()*y + x);
+        if( (0 <= x && x <= this.getDimX()) && (0 <= y && y <= this.getDimY()) ) {
+            return node.get(this.getDimY() * y + x);
+        } else { return null; }
     }
 
     /*@Override
@@ -231,6 +254,15 @@ public class Room implements PathFindingGraph {
         return neighbours;
     }
 
+    /**
+     * Calculates the cost for moving from a node to its neighbour where
+     * no node is more costly than any other.
+     *
+     * @param node        The node from which the movement takes place.
+     * @param neighbour   The neighbour to which the movement takes place.
+     *
+     * @return Cost The actual cost as an integer value.
+     */
 	@Override
 	public synchronized Integer cost(PathFindingNode node, PathFindingNode neighbour) {
 	ArrayList<PathFindingNode> neighbours = neighbours(node);
@@ -289,7 +321,7 @@ public class Room implements PathFindingGraph {
     /**
      * Call this method to force climate update
      * along all nodes in the grid.
-     * @param propagationDrop
+     * @param propagationDrop The rate of which the climate dissipates from @link se.uu.it.runestone.teamone.map.Node to Node.
      */
     public void propagateClimate(Double propagationDrop){
         if(propagationDrop >= 1 && propagationDrop <= 0.01)
@@ -333,13 +365,20 @@ public class Room implements PathFindingGraph {
     }
 
     /**
-     * Will update temperature of Node in relation to average temperature and distance to sensor.
-     * @param sensor
-     * @param node
-     * @param refHumidity
-     * @param refLight
-     * @param refTemperature
-     * @param factor
+     * Updates the climate of all nodes based off climate in the
+     * Master sensor and reference climates. The scaling factor
+     * is used to calculate the climate drop between Nodes.
+     *
+     * @author Daniel Eliassen
+     *
+     * @param sensor Master sensor from which climate is taken.
+     * @param node List of Nodes to update.
+     * @param refHumidity Average humidity based on all sensors.
+     * @param refLight Average lighting based on all sensors.
+     * @param refTemperature Average temperature based on all
+     *                       sensors.
+     * @param factor Scaling factor which climate dissipates
+     *               from one Node to another.
      */
 	public void updateClimate(Sensor sensor, Node node, Double refHumidity, Double refLight, Double refTemperature, Double factor){
         Double sHumidity = sensor.getHumidity();
