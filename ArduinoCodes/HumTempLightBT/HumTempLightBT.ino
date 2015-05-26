@@ -6,7 +6,12 @@
 #include <Wire.h>
 #include "Adafruit_SI1145.h" // Import for lightsensorlib
 
-  #define DHTPIN 7     // what pin we're connected to
+//#define SENSORNAME "SENSOR1"
+//#define SENSORNAME "SENSOR2"
+#define SENSORNAME "SENSOR3"
+
+
+  #define DHTPIN 7     // What pin we're connected to with the Humidity sensor
   // The type you're using!
   #define DHTTYPE DHT22   // DHT 22  (AM2302)
   DHT dht(DHTPIN, DHTTYPE);
@@ -40,13 +45,15 @@ void loop() {
   
   //If connection is available and any message has been received from master, then send to master.
   if(SensorBT.available() /*&& (SensorBT.read() > 0)*/ ){
-    /*Serial.print(" NAME: [SENSOR1] LIGHT: [");
+    Serial.print(" NAME: [");
+    Serial.print(SENSORNAME);
+    Serial.print("] LIGHT: [");
     Serial.print(lightLevel);
     Serial.print("] TEMPERATURE: [");
     Serial.print(temperature);
     Serial.print("] HUMIDITY: [");
     Serial.print(humidity);
-    Serial.print("]\r\n");*/
+    Serial.print("]\r\n");
     sendOverBT();
 
   }
