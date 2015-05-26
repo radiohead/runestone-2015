@@ -33,7 +33,7 @@ public class Sensor extends Thread implements SerialPortEventListener{
 	SerialPort connection = null;
 	private Boolean running = true;
 	Node node = null;
-    private int identity;
+    	private int identity;
 	private BufferedReader input = null;
 	private OutputStream output = null;
 	private Coordinate placement;
