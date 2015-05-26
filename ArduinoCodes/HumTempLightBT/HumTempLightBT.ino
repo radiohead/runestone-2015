@@ -6,9 +6,9 @@
 #include <Wire.h>
 #include "Adafruit_SI1145.h" // Import for lightsensorlib
 
-//#define SENSORNAME "SENSOR1"
+#define SENSORNAME "SENSOR1"
 //#define SENSORNAME "SENSOR2"
-#define SENSORNAME "SENSOR3"
+//#define SENSORNAME "SENSOR3"
 
 
   #define DHTPIN 7     // What pin we're connected to with the Humidity sensor
@@ -35,6 +35,11 @@ Adafruit_SI1145 lightsensor = Adafruit_SI1145();
 void setup() {
   Serial.begin(9600);                //Start the Serial connection
   SensorBT.begin(9600);              //Start Bluetooth
+  delay(1500);
+  if(! lightsensor.begin()){
+    Serial.println("Failed to connect to lightsensor");
+    while(1);
+   }
   dht.begin();
 }
 
@@ -55,7 +60,6 @@ void loop() {
     Serial.print(humidity);
     Serial.print("]\r\n");
     sendOverBT();
-
   }
   delay(5000);
 }
@@ -66,7 +70,7 @@ void sendOverBT(){
   dtostrf(humidity,4,2,hText);
   dtostrf(lightLevel,4,2,lText);
   dtostrf(temperature,4,2,tText);
-  sprintf(buffer," NAME: [SENSOR1] LIGHT: [%s] TEMPERATURE: [%s] HUMIDITY: [%s]\r\n",lText ,tText, hText); // sprintf cannto handle floats.
+  sprintf(buffer," NAME: [%s] LIGHT: [%s] TEMPERATURE: [%s] HUMIDITY: [%s]\r\n",SENSORNAME,lText ,tText, hText); // sprintf cannto handle floats.
   SensorBT.write(buffer);  
 }
 
