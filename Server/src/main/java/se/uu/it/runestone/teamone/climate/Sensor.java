@@ -147,7 +147,7 @@ public class Sensor extends Thread implements SerialPortEventListener{
 	}
 
 	public ArrayList<Double> parseClimate(String contents){
-		ArrayList < Double > result = new ArrayList < >();
+		ArrayList < Double > result = new ArrayList < Double >();
 		Matcher m = Pattern.compile( "(?<!R)[-+]?\\d*\\.?\\d+([eE][-+]?\\d+)?" ).matcher(contents);
 
 		while ( m.find() )
