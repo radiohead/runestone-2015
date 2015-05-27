@@ -28,6 +28,6 @@ public class TurnRight extends TurnCommand {
 
     @Override
     public String toString() {
-        return "turn right";
+        return "right\n";
     }
 }

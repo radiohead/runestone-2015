@@ -9,6 +9,6 @@ public class MoveForward extends Command {
 
     @Override
     public String toString() {
-        return "forward";
+        return "forward\n";
     }
 }

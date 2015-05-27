@@ -10,6 +10,8 @@ import se.uu.it.runestone.teamone.robotcontrol.command.Command;
  * @author Åke Lagercrantz
  */
 public class Robot implements Runnable {
+    private String name;
+    private String mac_address;
 
     private Communicator communicator;
     private Thread communicatorThread;
@@ -24,9 +26,12 @@ public class Robot implements Runnable {
      *
      * TODO: Add communication info parameters.
      */
-    public Robot() {
-        System.out.println("Rboot - Creating communicator.");
-        this.communicator = new Communicator();
+    public Robot(String name, String mac_address) {
+        this.name = name;
+        this.mac_address = mac_address;
+
+        System.out.println("Robot - Creating communicator.");
+        this.communicator = new Communicator(this.name, this.mac_address);
     }
 
     @Override

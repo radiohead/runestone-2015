@@ -17,6 +17,9 @@ jar {
 
 repositories {
     mavenCentral()
+    flatDir {
+        dirs  '/opt/lejos-nxj/lib/pc'
+    }
 }
 
 /*sourceSets {
@@ -33,6 +36,8 @@ mainClassName = "se.uu.it.runestone.teamone.Application"
 dependencies {
     compile 'org.rxtx:rxtx:2.1.7'
     compile 'org.json:json:20141113'
+    compile 'net.sf.bluecove:bluecove:2.1.0'
+    compile name: 'pccomm'
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
