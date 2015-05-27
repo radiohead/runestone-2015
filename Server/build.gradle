@@ -1,5 +1,15 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.3.RELEASE")
+    }
+}
+
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'spring-boot'
 jar {
     baseName = 'gs-rest-service'
     version =  '0.1.0'
@@ -17,6 +27,8 @@ repositories {
         }
   }
 }*/
+
+mainClassName = "se.uu.it.runestone.teamone.Application"
 
 dependencies {
     compile 'org.rxtx:rxtx:2.1.7'
