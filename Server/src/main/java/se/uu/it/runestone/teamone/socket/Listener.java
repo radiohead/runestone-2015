@@ -49,15 +49,32 @@ public class Listener {
                 if (input.equals("map")) { // map
                     Integer width = this.delegate.warehouseWidth();
                     Integer height = this.delegate.warehouseHeight();
-                    out.println(width.toString() + "," + height.toString()); // <x>,<y>
-                } else if (input.startsWith("goto,")) { // "goto,<x>,<y>"
+
+                    // TODO: send obstacles positions as well
+                    out.println("{\"size_x\": " + width.toString() +", \"size_y\": " + height.toString() +"}"); // <x>,<y>
+                } else if (input.startsWith("goto,")) {
                     String[] parts = input.split(",");
-                    Integer x = Integer.valueOf(parts[1]);
-                    Integer y = Integer.valueOf(parts[2]);
 
-                    this.delegate.goTo(x,y);
+                    if (parts.length == 3) {  // "goto,<x>,<y>"
+                        Integer x = Integer.valueOf(parts[1]);
+                        Integer y = Integer.valueOf(parts[2]);
 
-                    out.println("On my way!");
+                        this.delegate.goTo(x,y);
+                        out.println("{\"status\": \"processing\"}");
+                    } else if (parts.length == 4) {
+                        out.println("{\"status\": \"processing\"}");
+                    } else {
+                        out.println("{\"error\": \"not_available\"}");
+                    }
+
+                } else if (input.equals("robot")) {
+                    out.println("[{\"id\": 1, \"name\": \"taikaviitta\", \"direction\": \"east\", \"position_x\": 0, \"position_y\":0}]");
+                } else if (input.equals("release")) {
+                    out.println("{\"success\": true}");
+                } else if (input.equals("sensor")) {
+                    out.println("[{\"id\": 1, \"name\": \"arduino-1\", \"light\": \"1\", \"temperature\": 20, \"position_x\": 2, \"position_y\": 2}]");
+                } else {
+                    out.println("{\"error\": \"not_available\"}");
                 }
             }
 
