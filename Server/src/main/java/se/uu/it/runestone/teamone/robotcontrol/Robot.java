@@ -26,12 +26,18 @@ public class Robot implements Runnable {
      *
      * TODO: Add communication info parameters.
      */
-    public Robot(String name, String mac_address) {
+    public Robot(String name, String mac_address, boolean test) {
         this.name = name;
         this.mac_address = mac_address;
 
         System.out.println("Robot - Creating communicator.");
-        this.communicator = new Communicator(this.name, this.mac_address);
+
+        if (test) {
+            this.communicator = new TestCommunicator(this.name, this.mac_address);
+        }
+        else {
+            this.communicator = new Communicator(this.name, this.mac_address);
+        }
     }
 
     @Override
