@@ -1,10 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+var net = require('net');
 
 // template data for robot
 var robot_data = {
@@ -17,96 +14,150 @@ var robot_data = {
   pack_size: 0
 };
 
-router.get('/robot/manual/true', function(req, res, next) {
-  robot_data.manual = true;
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify({complete: true}));
-});
-
-router.get('/robot/manual/false', function(req, res, next) {
-  robot_data.manual = false;
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify({complete: true}));
-});
-
-router.post('/robot/move', function(req, res, next) {
-  var manual = robot_data.manual;
-  robot_data = req.body;
-  robot_data.x = parseInt(robot_data.x);
-  robot_data.y = parseInt(robot_data.y);
-  robot_data.manual = manual;
-  console.log(robot_data);
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify({complete: true}));
-});
-
-router.get('/sensordata', function(req, res, next) {
-  //there will be code to get data from sensors and robot
-  var sensors = [
-    {
-      x: 0,
-      y: 0,
-      temperature: 36,
-      light: 30
-    },
-    {
-      x: 0,
-      y: 9,
-      temperature: 35,
-      light: 20
-    },
-    {
-      x: 9,
-      y: 0,
-      temperature: 32,
-      light: 10
-    },
-    {
-      x: 9,
-      y: 9,
-      temperature: 20,
-      light: 5
-    }
-  ];
-
-  //there will be code to get robots data
-  if (robot_data.manual == false) {
-    if (Math.random() > 0.5) {
-      if (Math.random() > 0.5) {
-        if (robot_data.x > 0) {
-          robot_data.x--;
-          robot_data.rotated = 'left';
-        }
+var talk_with_server = function (command, callback) {
+  var client = net.connect({port: 4444}, function() { //'connect' listener
+    console.log('connected to server!');
+    client.write(command + "\r\n");
+    client.on('data', function(data) {
+      console.log(data.toString());
+      client.end();
+      if (data.error) {
+        console.log('ERROR' + data.error);
       } else {
-        if (robot_data.x < 9) {
-          robot_data.x++;
-          robot_data.rotated = 'right';
-        }
+        callback(data);
       }
-    } else {
-      if (Math.random() > 0.5) {
-        if (robot_data.y > 0) {
-          robot_data.y--;
-          robot_data.rotated = 'up';
-        }
-      } else {
-        if (robot_data.y < 9) {
-          robot_data.y++;
-          robot_data.rotated = 'down';
-        }
-      }
+    });
+    client.on('end', function() {
+      console.log('disconnected from server');
+    });
+  });
+};
+
+var convert_robot_data = function (r) {
+  var robots = [];
+  for (var i in r) {
+    if (!robots[i]) robots[i] = {};
+
+    robots[i].x = r[i].position_x;
+    robots[i].y = r[i].position_y;
+
+    switch (r[i].direction) {
+      case 'east': robots[i].rotated = 'right'; break;
+      case 'west': robots[i].rotated = 'left'; break;
+      case 'north': robots[i].rotated = 'up'; break;
+      case 'south': robots[i].rotated = 'down'; break;
     }
   }
 
-  var robots = [
-    robot_data
-  ];
+  return robots;
+}
+
+var convert_sensor_data = function (r) {
+  var sensors = [];
+  for (var i in r) {
+    if (!sensors[i]) sensors[i] = {};
+
+    sensors[i].x = r[i].position_x;
+    sensors[i].y = r[i].position_y;
+
+    sensors[i].name = r[i].name;
+    sensors[i].id = r[i].id;
+
+    sensors[i].light = r[i].light;
+    sensors[i].temperature = r[i].temperature;
+  }
+
+  return sensors;
+}
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  talk_with_server("map", function(data) {
+    var map = JSON.parse(data);
+
+    talk_with_server("robot", function(data) {
+      var robots = convert_robot_data(JSON.parse(data));
+      robot_data = robots[0];
+      talk_with_server ("sensor", function(data) {
+        var sensors = convert_sensor_data(JSON.parse(data));
+
+        res.render('index', {
+          title: 'Express',
+          map: map,
+          data: JSON.stringify({
+            sensors: sensors,
+            robots: robots
+          })
+        });
+      });
+    });
+  });
+
+
+});
+
+router.post('/robot/move', function(req, res, next) {
+  var x = req.body.x;
+  var y = req.body.y;
 
   res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify({
-    sensors: sensors,
-    robots: robots
-  }));
+
+  talk_with_server("goto," + x + "," + y, function(data) {
+    data = JSON.parse(data);
+    if (data.status && data.status == "processing") {
+      res.end(JSON.stringify({complete: true}));
+    } else {
+      res.end(JSON.stringify({complete: false}));
+    }
+  });
+});
+
+router.post('/robot/release', function(req, res, next) {
+  talk_with_server("release", function(data) {
+    data = JSON.parse(data);console.log(data);
+
+    res.setHeader('Content-Type', 'application/json');
+    if (data.success) {
+      res.end(JSON.stringify({complete: true}));
+    } else {
+      res.end(JSON.stringify({complete: false}));
+    }
+  });
+});
+
+router.post('/robot/schedule', function(req, res, next) {
+  var temperature = req.body.temperature;
+  var light = req.body.light;
+  var size = req.body.pack_size;
+
+  res.setHeader('Content-Type', 'application/json');
+
+  talk_with_server("goto," + temperature + "," + light + "," + size, function(data){
+    data = JSON.parse(data);
+    if (data.status && data.status == "processing") {
+      res.end(JSON.stringify({complete: true}));
+    } else {
+      res.end(JSON.stringify({complete: false}));
+    }
+  });
+});
+
+router.get('/sensordata', function(req, res, next) {
+  talk_with_server ("robot", function(data) {
+    var robots = convert_robot_data(JSON.parse(data));
+    robot_data = robots[0];
+
+    talk_with_server ("sensor", function(data) {
+      var sensors = convert_sensor_data(JSON.parse(data));
+
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({
+        sensors: sensors,
+        robots: robots
+      }));
+    });
+  });
+
 })
 
 module.exports = router;
