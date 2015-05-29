@@ -61,8 +61,7 @@ public class CommandFactory {
      */
     private static TurnCommand rotation(Node from, Node to, Room.Direction currentDirection) {
         Room.Direction requiredDirection = Room.direction(from, to);
-        System.out.println("From position, x: " + from.getX() + " y: " + from.getY());
-        System.out.println("To position, x: " + to.getX() + " y: " + to.getY());
+
         switch (requiredDirection) {
             case NORTH:
                 if (currentDirection == Room.Direction.WEST) {
