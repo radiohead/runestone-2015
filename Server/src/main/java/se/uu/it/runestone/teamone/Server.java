@@ -44,7 +44,7 @@ public class Server extends Thread implements Runnable, ListenerDelegate {
         this.scheduler = new Scheduler();
 
         System.out.println("Server - Creating robot.");
-        this.robot = new Robot("taikaviitta", "00:16:53:17:1E:0A"); // TODO: Give robot coms info. <akelagercrantz>
+        this.robot = new Robot("taikaviitta", "00:16:53:17:1E:0A", true); // TODO: Give robot coms info. <akelagercrantz>
         this.robot.setCurrentPosition(this.map.nodeFromCoordinates(0, 0));
         this.robot.setCurrentDirection(Room.Direction.EAST);
         Thread robotThread = new Thread(this.robot);
