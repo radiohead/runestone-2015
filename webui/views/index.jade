@@ -6,74 +6,95 @@ block content
       td
         table.map
           - var n = 0
-          while n < 10
+          while n < map.size_x
             tr(id='maptr'+n)
             - var m = 0
-            while m < 10
+            while m < map.size_y
               td(id='maptd_'+n+'_'+m, data-x = m, data-y = n)
               - m++
             - n++
       td
-        div.alert.alert-info.sensorsdata
-          p.sensorid
-            em select sensor to view sensor data
-          p.sensortemperature
-          p.sensorlight
-        div.alert.alert-info.controlsdiv(data-robot=0)
-          | CONTROLS
-          table
-            tr
-              td
-              td
-                a.btn.btn-default.controls.disabled(data-action='up') UP
-              td
-            tr
-              td
-                a.btn.btn-default.controls.disabled(data-action='left') LEFT
-              td
-              td
-                a.btn.btn-default.controls.disabled(data-action='right') RIGHT
-            tr
-              td
-              td
-                a.btn.btn-default.controls.disabled(data-action='down') DOWN
-              td
-            tr
-              td
-                a.btn.btn-default.controls.disabled(data-action='rotate_left') ROTATE LEFT
-              td
-                a.btn.btn-default.controls.disabled(data-action='rotate_right') ROTATE RIGHT
-              td
-          a.btn.btn-default.startmanual.disabled START MANUAL
-          a.btn.btn-default.stopmanual STOP MANUAL
-      td
-        div.alert.alert-info.robotparams(data-robot=0)
-          form
-            .form-group
-              label(for='input_x') X
-              input.form-control#input_x
-            .form-group
-              label(for='input_y') Y
-              input.form-control#input_y
-            .form-group
-              label(for='input_req_temp') Required temperature
-              input.form-control#input_req_temp
-            .form-group
-              label(for='input_req_light') Required light
-              input.form-control#input_req_light
-            .form-group
-              label(for='input_pack_size') Package size
-              input.form-control#input_pack_size
-            a.btn.btn-default.sendrobotdata Change
+        table
+          tr
+            td
+              div.alert.alert-info.sensorsdata
+                p.sensorid
+                  em select sensor to view sensor data
+                p.sensortemperature
+                p.sensorlight
+          tr
+            td
+              //- div.alert.alert-info.controlsdiv(data-robot=1)
+                | CONTROLS
+                table
+                  tr
+                    td
+                    td
+                      a.btn.btn-default.controls.disabled(data-action='up') UP
+                    td
+                  tr
+                    td
+                      a.btn.btn-default.controls.disabled(data-action='left') LEFT
+                    td
+                    td
+                      a.btn.btn-default.controls.disabled(data-action='right') RIGHT
+                  tr
+                    td
+                    td
+                      a.btn.btn-default.controls.disabled(data-action='down') DOWN
+                    td
+                  tr
+                    td
+                      a.btn.btn-default.controls.disabled(data-action='rotate_left') ROTATE LEFT
+                    td
+                      a.btn.btn-default.controls.disabled(data-action='rotate_right') ROTATE RIGHT
+                    td
+                a.btn.btn-default.startmanual.disabled START MANUAL
+                a.btn.btn-default.stopmanual STOP MANUAL
+          tr
+            td
+              div.alert.alert-info.robotparams(data-robot=1)
+                h4 Manual
+                form
+                  .form-group
+                    label(for='input_x') X
+                    input.form-control#input_x
+                  .form-group
+                    label(for='input_y') Y
+                    input.form-control#input_y
+                  a.btn.btn-success.manualrobot Go
+                  | &nbsp;
+                  a.btn.btn-danger.releaserobot Return to automatic
+          tr
+            td
+              div.alert.alert-info.robotparams(data-robot=1)
+                h4 Schedule
+                form
+                  .form-group
+                    label(for='input_req_temp') Required temperature
+                    input.form-control#input_req_temp
+                  .form-group
+                    label(for='input_req_light') Required light
+                    input.form-control#input_req_light
+                  .form-group
+                    label(for='input_pack_size') Package size
+                    input.form-control#input_pack_size
+                  a.btn.btn-success.sendrobotdata Go
 
   div.hiddensensordata(style='display: none;')
-
+    #{data}
+  div.hiddenmapdata(style='display: none;')
+    #{JSON.stringify(map)}
 
   script.
+    var refresh_rate = 100000;
     var controls = $('.controlsdiv');
 
-    var sensors = [{x:0,y:0},{x:0,y:9},{x:9,y:0},{x:9,y:9}];
-    var robots = [{manual: false, x:0, y:0, rotated: 'up'}];
+    var data = JSON.parse($('.hiddensensordata').text().substring(1, $('.hiddensensordata').text().length - 1));
+    var map_data = JSON.parse($('.hiddenmapdata').text().substring(1, $('.hiddenmapdata').text().length - 1));
+
+    var sensors = data.sensors;
+    var robots =  data.robots;
     var selected_sensor = null;
 
     var put_sensors = function () {
@@ -84,52 +105,76 @@ block content
 
     put_sensors();
 
-    $('#maptd_5_5').html('<div id="robot_1" class="robot left_right" data-robot="1"></div>');
+    $('#maptd_' + robots[0].y + '_' + robots[0].x).html('<div id="robot_1" class="robot left_right" data-robot="1"></div>');
     $('.stopmanual').hide();
-    //- controls.hide();
 
     $('.map').on('click', '.robot', function(){
-      //- alert('robot');
       controls.attr('data-robot', $(this).attr('data-robot'));
       $(this).addClass('selected');
       $('.startmanual').removeClass('disabled');
       controls.show();
     });
 
-    $('.startmanual').on('click', function() {
+    $('.manualrobot').on('click', function() {
+      var manual = robots[0].manual;
+      var robot = $('#robot_1');
 
-      $.getJSON('/robot/manual/true', function (response) {
-        if (response.complete) {
-          $('.controls').each(function( index ) {
-            $(this).removeClass('disabled');
-          });
-          $('.stopmanual').show();
-          $('.startmanual').hide();
-          robots[0].manual = true;
+      var x = $('#input_x').val() || 0;
+      var y = $('#input_y').val() || 0;
+
+      var new_robot_data = {
+        x: x,
+        y: y
+      };
+
+      if (x < 0 || y < 0 || x > map_data.size_x - 1 || y > map_data.size_y - 1) {
+        alert('Incorrect coordinates, x range is {0,' + (map_data.size_x - 1) + '}, y range is {0,' + (map_data.size_y - 1) + '}');
+      } else {
+        var check_obstacles = true;
+        for (var i in map_data.obstacles) {
+          if (x == map_data.obstacles[i].position_x && y == map_data.obstacles[i].position_y) {
+            check_obstacles = false;
+          }
         }
-      });
+
+        if (check_obstacles) {
+          $.ajax({
+            type: 'POST',
+            url: '/robot/move',
+            dataType: 'json',
+            data: new_robot_data,
+            complete: function() {
+              console.log(arguments);
+            },
+            success: function(data, textStatus, jqXHR) {console.log('ASDA')
+              if (data.complete) {
+                alert('Robot is on his way to ' + JSON.stringify(new_robot_data));
+              }
+            }
+          });
+        } else {
+          alert('There is an obstacle in ' + JSON.stringify(new_robot_data));
+        }
+      }
+
 
     });
 
-    $('.stopmanual').on('click', function() {
-
-      $.getJSON('/robot/manual/false', function (response) {
-        if (response.complete) {
-          $('.controls').each(function( index ) {
-            $(this).addClass('disabled');
-          });
-          $('.startmanual').show();
-          $('.stopmanual').hide();
-          robots[0].manual = false;
+    $('.releaserobot').on('click', function() {
+      $.ajax({
+        type: 'POST',
+        url: '/robot/release',
+        success: function(data, textStatus, jqXHR) {
+          if (data.complete) {
+            alert('Robot is in auto mode');
+          }
         }
       });
-
-
     });
 
     $('.map').on('click', '.sensorarea', function() {
       var sensorid = $(this).attr('data-sensor');
-      $('.sensorid').text('Sensor ID: ' + $(this).attr('data-sensor'));
+      $('.sensorid').text('Sensor ID: ' + sensors[sensorid].id);
       $('.sensortemperature').text('Temperature: ' + sensors[sensorid].temperature);
       $('.sensorlight').text('Light: ' + sensors[sensorid].light);
       $('.sensorarea').each(function( index ) {
@@ -270,48 +315,19 @@ block content
     });
 
     $('.sendrobotdata').on('click', function() {
-      var manual = robots[0].manual;
-      robots[0].manual = true;
-
       var new_robot_data = {
-        x: $('#input_x').val(),
-        y: $('#input_y').val(),
-        req_temp: $('#input_req_temp').val(),
-        req_light: $('#input_req_light').val(),
+        temperature: $('#input_req_temp').val(),
+        light: $('#input_req_light').val(),
         pack_size: $('#input_pack_size').val()
-      }
-
-      for (var i in new_robot_data) {
-        if (new_robot_data[i] === '' || new_robot_data[i] == null) {
-          new_robot_data[i] = robots[0][i];
-        }
-      }
-
-      var robot = $('#robot_1');
+      };
 
       $.ajax({
         type: 'POST',
-        url: '/robot/move',
-        data: robots[0],
+        url: '/robot/schedule',
+        data: new_robot_data,
         success: function(data, textStatus, jqXHR) {
           if (data.complete) {
-            $('#maptd_' + new_robot_data.y + '_' + new_robot_data.x).html(robot);
-
-            var sensorarea = false;
-            for (var i in sensors) {
-              if (new_robot_data.x == sensors[i].x && new_robot_data.y == sensors[i].y) {
-                sensorarea = true;
-              }
-            }
-
-            robots[0].manual = manual;
-
-            if (!sensorarea) {
-              put_sensors();
-              if (selected_sensor != null) {
-                $('#'+selected_sensor).addClass('selected');
-              }
-            }
+            alert('Robot is scheduled with params ' + JSON.stringify(new_robot_data));
           }
         }
       });
@@ -325,7 +341,7 @@ block content
 
           sensors = response.sensors;
 
-          if (robots[0].manual == false) {
+          //if (robots[0].manual == false) {
             var robot = $('#robot_1');
             var robot_data = response.robots[0];
             if (robot_data.rotated == 'left' || robot_data.rotated == 'right') {
@@ -353,10 +369,10 @@ block content
                 $('#'+selected_sensor).addClass('selected');
               }
             }
-          }
+          //}
 
         }
-        setTimeout(pollServerForData, 3000);
+        setTimeout(pollServerForData, refresh_rate);
       });
     };
-    setTimeout(pollServerForData, 3000);
+    setTimeout(pollServerForData, refresh_rate);
