@@ -35,13 +35,13 @@ var talk_with_server = function (command, callback) {
 
 var convert_robot_data = function (r) {
   var robots = [];
-  for (var i in r) {
+  for (var i in r.robots) {
     if (!robots[i]) robots[i] = {};
 
-    robots[i].x = r[i].position_x;
-    robots[i].y = r[i].position_y;
+    robots[i].x = r.robots[i].position_x;
+    robots[i].y = r.robots[i].position_y;
 
-    switch (r[i].direction) {
+    switch (r.robots[i].direction) {
       case 'east': robots[i].rotated = 'right'; break;
       case 'west': robots[i].rotated = 'left'; break;
       case 'north': robots[i].rotated = 'up'; break;
@@ -54,17 +54,17 @@ var convert_robot_data = function (r) {
 
 var convert_sensor_data = function (r) {
   var sensors = [];
-  for (var i in r) {
+  for (var i in r.sensors) {
     if (!sensors[i]) sensors[i] = {};
 
-    sensors[i].x = r[i].position_x;
-    sensors[i].y = r[i].position_y;
+    sensors[i].x = r.sensors[i].position_x;
+    sensors[i].y = r.sensors[i].position_y;
 
-    sensors[i].name = r[i].name;
-    sensors[i].id = r[i].id;
+    sensors[i].name = r.sensors[i].name;
+    sensors[i].id = r.sensors[i].id;
 
-    sensors[i].light = r[i].light;
-    sensors[i].temperature = r[i].temperature;
+    sensors[i].light = r.sensors[i].light;
+    sensors[i].temperature = r.sensors[i].temperature;
   }
 
   return sensors;

@@ -1,5 +1,6 @@
 package se.uu.it.runestone.teamone;
 
+import se.uu.it.runestone.teamone.climate.Sensor;
 import se.uu.it.runestone.teamone.map.Node;
 import se.uu.it.runestone.teamone.map.Room;
 import se.uu.it.runestone.teamone.pathfinding.PathFinder;
@@ -92,5 +93,15 @@ public class Server extends Thread implements Runnable, ListenerDelegate {
     public void goTo(Integer x, Integer y) {
         Node node = this.map.nodeFromCoordinates(x, y);
         this.dispatch.setManualMode(node);
+    }
+
+    @Override
+    public Robot getRobotInstance(int robotId) {
+        return this.robot;
+    }
+
+    @Override
+    public ArrayList<Sensor> getSensors() {
+        return this.map.getSensorList();
     }
 }

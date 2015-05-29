@@ -160,4 +160,5 @@ public class Sensor extends Thread implements SerialPortEventListener{
 	}
 	public Integer getX(){ return this.placement.getX();}
 	public Integer getY(){ return this.placement.getY();}
+	public String getSensorName(){ return this.sensorName; }
 }

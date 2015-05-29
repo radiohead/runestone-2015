@@ -1,5 +1,8 @@
 package se.uu.it.runestone.teamone.socket;
 
+import se.uu.it.runestone.teamone.climate.Sensor;
+import se.uu.it.runestone.teamone.robotcontrol.Robot;
+
 import javax.net.ServerSocketFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import org.json.*;
 
 /**
  * Initiates and listens on a socket.
@@ -68,11 +73,45 @@ public class Listener {
                     }
 
                 } else if (input.equals("robot")) {
-                    out.println("[{\"id\": 1, \"name\": \"taikaviitta\", \"direction\": \"east\", \"position_x\": 0, \"position_y\":0}]");
+                    //"[{\"id\": 1, \"name\": \"taikaviitta\", \"direction\": \"east\", \"position_x\": 0, \"position_y\":0}]"
+                    // TODO: When we start supporting multiple robot we will need to add instance handling here
+                    JSONObject json = new JSONObject();
+                    ArrayList<Robot> robotsList = new ArrayList<>();
+                    robotsList.add(this.delegate.getRobotInstance(0));
+
+                    for (Robot robot : robotsList) {
+                        JSONObject singleRobotJson = new JSONObject();
+
+                        singleRobotJson.put("id", robot.getId());
+                        singleRobotJson.put("name", robot.getName());
+                        singleRobotJson.put("direction", robot.getCurrentDirection().name().toLowerCase());
+                        singleRobotJson.put("position_x", robot.getCurrentPosition().getX());
+                        singleRobotJson.put("position_y", robot.getCurrentPosition().getY());
+
+                        json.append("robots", singleRobotJson);
+                    }
+
+                    out.println(json.toString());
                 } else if (input.equals("release")) {
                     out.println("{\"success\": true}");
                 } else if (input.equals("sensor")) {
-                    out.println("[{\"id\": 1, \"name\": \"arduino-1\", \"light\": \"1\", \"temperature\": 20, \"position_x\": 2, \"position_y\": 2}]");
+                    JSONObject json = new JSONObject();
+                    ArrayList<Sensor> sensorsList = this.delegate.getSensors();
+
+                    for (Sensor sensor : sensorsList) {
+                        JSONObject singleSensorJson = new JSONObject();
+
+                        singleSensorJson.put("id", sensor.getId());
+                        singleSensorJson.put("name", sensor.getSensorName());
+                        singleSensorJson.put("light", sensor.getLight());
+                        singleSensorJson.put("temperature", sensor.getTemperature());
+                        singleSensorJson.put("position_x", sensor.getX());
+                        singleSensorJson.put("position_y", sensor.getY());
+
+                        json.append("sensors", singleSensorJson);
+                    }
+
+                    out.println(json.toString());
                 } else {
                     out.println("{\"error\": \"not_available\"}");
                 }

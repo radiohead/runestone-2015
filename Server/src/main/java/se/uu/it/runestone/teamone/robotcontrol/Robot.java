@@ -11,6 +11,7 @@ import se.uu.it.runestone.teamone.robotcontrol.command.TurnCommand;
  * @author Åke Lagercrantz
  */
 public class Robot implements Runnable {
+    private int id;
     private String name;
     private String mac_address;
 
@@ -28,6 +29,7 @@ public class Robot implements Runnable {
      * TODO: Add communication info parameters.
      */
     public Robot(String name, String mac_address, boolean test) {
+        this.id = 0;
         this.name = name;
         this.mac_address = mac_address;
 
@@ -131,5 +133,13 @@ public class Robot implements Runnable {
         } else {
             return false;
         }
+    }
+
+    public synchronized String getName() {
+        return name;
+    }
+
+    public synchronized int getId() {
+        return id;
     }
 }
