@@ -101,8 +101,9 @@ public class Dispatch implements Runnable {
         ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPathToNodeMatchingRequirements(robot.getCurrentPosition(), job.goods.getRequirements(), this.room);
 
         ArrayList<Command> commands = CommandFactory.commandsFromPath(path, robot.getCurrentDirection());
-
-        this.executeCommands(robot, commands);
+        if (this.executeCommands(robot, commands)) {
+            robot.setCurrentPosition(path.get(path.size() - 1));
+        }
     }
 
     /**
@@ -114,10 +115,12 @@ public class Dispatch implements Runnable {
     private void dispatch(Robot robot, Node destination) {
         @SuppressWarnings({"unchecked"}) // We know the return type will be ArrayList<Node> since we supply the nodes ourselves.
         ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPath(robot.getCurrentPosition(), destination, this.room);
-
+        System.out.println("Current position, x: " + robot.getCurrentPosition().getX() + " y: " + robot.getCurrentPosition().getY());
         ArrayList<Command> commands = CommandFactory.commandsFromPath(path, robot.getCurrentDirection());
 
-        this.executeCommands(robot, commands);
+        if (this.executeCommands(robot, commands)) {
+            robot.setCurrentPosition(destination);
+        }
     }
 
     /**

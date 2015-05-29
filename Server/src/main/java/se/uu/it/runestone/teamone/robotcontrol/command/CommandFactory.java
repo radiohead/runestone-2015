@@ -61,6 +61,7 @@ public class CommandFactory {
      */
     private static TurnCommand rotation(Node from, Node to, Room.Direction currentDirection) {
         Room.Direction requiredDirection = Room.direction(from, to);
+
         switch (requiredDirection) {
             case NORTH:
                 if (currentDirection == Room.Direction.WEST) {

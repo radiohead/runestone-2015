@@ -3,6 +3,7 @@ package se.uu.it.runestone.teamone.robotcontrol;
 import se.uu.it.runestone.teamone.map.Node;
 import se.uu.it.runestone.teamone.map.Room;
 import se.uu.it.runestone.teamone.robotcontrol.command.Command;
+import se.uu.it.runestone.teamone.robotcontrol.command.TurnCommand;
 
 /**
  * Represents a real world robot moving around the warehouse floor.
@@ -51,7 +52,12 @@ public class Robot implements Runnable {
                 } catch (Exception e) { }
             } else {
                 System.out.println("Robot - sending command \"" + command + "\" to robot.");
+
+                // IS: what happens if sendCommand fails?
                 this.communicator.sendCommand(command);
+                if (command instanceof TurnCommand) {
+                    this.setCurrentDirection(((TurnCommand) command).directionAfterExecution(this.getCurrentDirection()));
+                }
                 this.setCurrentCommand(null);
             }
         }

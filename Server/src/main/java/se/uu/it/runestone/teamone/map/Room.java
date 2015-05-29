@@ -220,7 +220,7 @@ public class Room implements PathFindingGraph {
 			return Direction.EAST;
 		} else if (from.getY() > to.getY()) {
 			return Direction.NORTH;
-		} else if (from.getY() > to.getY()) {
+		} else if (from.getY() < to.getY()) {
 			return Direction.SOUTH;
 		} else {
 			return Direction.NONE;
