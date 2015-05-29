@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$USER_HOME$/Work/School/runestone-2015/webservice/webservice.iml" filepath="$USER_HOME$/Work/School/runestone-2015/webservice/webservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/webservice.iml" filepath="$PROJECT_DIR$/webservice.iml" />
     </modules>
   </component>
 </project>

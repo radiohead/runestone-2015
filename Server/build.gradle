@@ -1,37 +1,19 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.3.RELEASE")
-    }
-}
-
 apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'spring-boot'
+apply plugin: 'application'
+
+mainClassName = "se.uu.it.runestone.teamone.Application"
+
 jar {
-    baseName = 'gs-rest-service'
+    baseName = 'runestone-1-server'
     version =  '0.1.0'
 }
 
 repositories {
     mavenCentral()
     flatDir {
-        dirs  '/opt/lejos-nxj/lib/pc'
+        dirs  './deps'
     }
 }
-
-/*sourceSets {
-    main {
-        java {
-            srcDir 'src'
-            exclude '
-        }
-  }
-}*/
-
-mainClassName = "se.uu.it.runestone.teamone.Application"
 
 dependencies {
     compile 'org.rxtx:rxtx:2.1.7'
