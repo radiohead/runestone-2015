@@ -85,6 +85,9 @@ public class Server extends Thread implements Runnable, ListenerDelegate {
     }
 
     @Override
+    public Scheduler getScheduler() { return this.scheduler; }
+
+    @Override
     public Dispatch getDispatcher() { return this.dispatch; }
 
     @Override

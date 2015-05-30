@@ -4,6 +4,7 @@ import se.uu.it.runestone.teamone.climate.Sensor;
 import se.uu.it.runestone.teamone.map.Room;
 import se.uu.it.runestone.teamone.robotcontrol.Dispatch;
 import se.uu.it.runestone.teamone.robotcontrol.Robot;
+import se.uu.it.runestone.teamone.scheduler.Scheduler;
 
 import java.util.ArrayList;
 
@@ -21,6 +22,8 @@ public interface ListenerDelegate {
      * @param y The y coordinate.
      */
     void goTo(Integer x, Integer y);
+
+    Scheduler getScheduler();
 
     Dispatch getDispatcher();
 

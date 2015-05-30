@@ -23,23 +23,20 @@ import gnu.io.SerialPortEventListener;
  *
  */
 
-public class Sensor extends Thread implements SerialPortEventListener{
-
-
+public class Sensor extends Thread implements SerialPortEventListener {
 	private static final int TIME_OUT = 2000;
 	private static final int BAUD_RATE = 9600;
 
 	String sensorName = null;
 	SerialPort connection = null;
 	private Boolean running = true;
-	Node node = null;
-    	private int identity;
+	private int identity;
 	private BufferedReader input = null;
 	private OutputStream output = null;
 	private Coordinate placement;
-	private Double humidity=(double) 666;
-	private Double light=(double) 666;
-	private Double temperature=(double) 666;
+	private Double humidity=(double) 30;
+	private Double light=(double) 50;
+	private Double temperature=(double) 25;
 
 	public Double getTemperature() {
 		return temperature;
@@ -57,18 +54,16 @@ public class Sensor extends Thread implements SerialPortEventListener{
         this.identity = identity;
 	}
 
-	private Boolean init() throws InterruptedException{
+	private Boolean init() throws InterruptedException {
 		try{
 			CommPortIdentifier port = CommPortIdentifier.getPortIdentifier(sensorName);
 			SerialPort handle = (SerialPort) port.open("whyBother?",TIME_OUT);
-			if(handle != null){
-				this.connection = handle;
-			}
+			if (handle == null) return false;
+			this.connection = handle;
 			this.connection.setSerialPortParams(BAUD_RATE, SerialPort.DATABITS_8,
                     SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 			this.connection.addEventListener(this);
 			this.connection.notifyOnDataAvailable(true);
-			//System.out.println("Sensor"+identity+" - Waiting for connection.");
 			Thread.sleep(2000);
 			this.requestData();
             System.out.println("Sensor"+identity +" - Connection established.");
@@ -94,12 +89,16 @@ public class Sensor extends Thread implements SerialPortEventListener{
 
 	public void run(){
 		System.out.println("Sensor"+identity+" - initating.");
-		try{
-            init();
-        } catch (InterruptedException ie){ ie.printStackTrace();}
-		while(running){
-            // Keep on runnin' :)
-        }
+
+		while (running) {
+			try {
+				// Try to re-establish connection
+				if (this.connection == null) this.init();
+			} catch (InterruptedException ie) {
+				ie.printStackTrace();
+			}
+		}
+
 		this.close();
 	}
 

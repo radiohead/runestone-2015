@@ -50,9 +50,12 @@ public class Room implements PathFindingGraph {
      * @param ys Dimension of the room on the y-axis.
      */
 	public Room(int xs, int ys){
-        final Sensor sensor1 = new Sensor(1,"/dev/tty.HC-06-DevB",new Coordinate(0,0));
-        final Sensor sensor2 = new Sensor(2,"/dev/tty.HC-06-DevB-1",new Coordinate(0,this.getDimY()));
-        final Sensor sensor3 = new Sensor(3,"/dev/tty.HC-06-DevB-2",new Coordinate(this.getDimX(), this.getDimY()));
+        this.dimX = xs;
+        this.dimY = ys;
+
+        final Sensor sensor1 = new Sensor(1,"/dev/tty.HC-06-DevB",new Coordinate(this.getDimX() - 1, 0));
+        final Sensor sensor2 = new Sensor(2,"/dev/tty.HC-06-DevB-1",new Coordinate(0,this.getDimY() - 1));
+        final Sensor sensor3 = new Sensor(3,"/dev/tty.HC-06-DevB-2",new Coordinate(this.getDimX() - 1, this.getDimY() - 1));
 
         Thread thread = new Thread(){
             public void run(){
@@ -83,14 +86,10 @@ public class Room implements PathFindingGraph {
         if(!(xs >= 0 && ys >= 0 ))
             System.out.println("Room cannot be this small.");
         if(sensorList != null){
-            for(Sensor sensor : sensorList){
-                if(!(sensor.getX() <= xs && sensor.getY() <=ys))
-                    System.out.println("Sensor outside grid.");
+            for(Sensor sensor : sensorList) {
+                if(!(sensor.getX() < xs && sensor.getY() < ys)) System.out.println("Sensor outside grid.");
             }
         }
-
-		this.dimX=xs;
-		this.dimY=ys;
 
         node = new ArrayList<>();
         Node temp;

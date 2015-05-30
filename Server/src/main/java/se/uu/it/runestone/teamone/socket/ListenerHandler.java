@@ -5,6 +5,8 @@ import se.uu.it.runestone.teamone.climate.Sensor;
 import se.uu.it.runestone.teamone.map.Node;
 import se.uu.it.runestone.teamone.map.Room;
 import se.uu.it.runestone.teamone.robotcontrol.Robot;
+import se.uu.it.runestone.teamone.scheduler.Goods;
+import se.uu.it.runestone.teamone.scheduler.Job;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -65,6 +67,9 @@ public class ListenerHandler extends Thread {
                         this.delegate.goTo(x, y);
                         out.println("{\"status\": \"processing\"}");
                     } else if (parts.length == 4) {
+                        Goods goods = new Goods(Integer.parseInt(parts[1]), Float.parseFloat(parts[2]), Float.parseFloat(parts[3]));
+                        this.delegate.getScheduler().scheduleJob(new Job(goods, Job.Priority.MEDIUM));
+
                         out.println("{\"status\": \"processing\"}");
                     } else {
                         out.println("{\"error\": \"not_available\"}");
