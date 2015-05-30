@@ -10,6 +10,7 @@ Icon
 .idea/*
 Server/.idea/*
 workspace.xml
+*.iml
 
 # Thumbnails
 ._*
