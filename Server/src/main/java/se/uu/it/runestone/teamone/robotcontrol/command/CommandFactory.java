@@ -35,7 +35,7 @@ public class CommandFactory {
 
         if (Room.direction(from, to) == currentDirection) { // Move forward
             remainingPath.remove(from);
-            MoveForward moveForwardCommand = new MoveForward();
+            MoveForward moveForwardCommand = new MoveForward(from);
             accumulator.add(moveForwardCommand);
             return commandsFromPath(remainingPath, currentDirection, accumulator);
         } else { // Rotate

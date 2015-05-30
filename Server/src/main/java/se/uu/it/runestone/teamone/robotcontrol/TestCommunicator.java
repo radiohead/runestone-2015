@@ -1,7 +1,7 @@
 package se.uu.it.runestone.teamone.robotcontrol;
 
 import se.uu.it.runestone.teamone.robotcontrol.command.Command;
-import se.uu.it.runestone.teamone.robotcontrol.Communicator;
+import java.util.concurrent.TimeUnit;
 
 public class TestCommunicator extends Communicator {
 	public TestCommunicator(String brickName, String brickAddress) {
@@ -10,11 +10,16 @@ public class TestCommunicator extends Communicator {
 
 	@Override
 	public void connect() {
-		return;
 	}
 
 	@Override
 	public Boolean sendCommand(Command command) {
-		return true;
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return true;
 	}
 }

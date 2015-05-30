@@ -1,6 +1,8 @@
 package se.uu.it.runestone.teamone.socket;
 
 import se.uu.it.runestone.teamone.climate.Sensor;
+import se.uu.it.runestone.teamone.map.Node;
+import se.uu.it.runestone.teamone.map.Room;
 import se.uu.it.runestone.teamone.robotcontrol.Robot;
 
 import javax.net.ServerSocketFactory;
@@ -11,6 +13,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+
 import org.json.*;
 
 /**
@@ -52,11 +55,21 @@ public class Listener {
                 System.out.println("Listener - Received command \"" + input + "\"");
 
                 if (input.equals("map")) { // map
-                    Integer width = this.delegate.warehouseWidth();
-                    Integer height = this.delegate.warehouseHeight();
+                    Room room = this.delegate.getRoom();
+                    JSONObject json = new JSONObject();
 
-                    // TODO: send obstacles positions as well
-                    out.println("{\"size_x\": " + width.toString() +", \"size_y\": " + height.toString() +"}"); // <x>,<y>
+                    json.put("size_x", room.getDimX());
+                    json.put("size_y", room.getDimX());
+
+                    for (Node n : room.getObstructedNodes()) {
+                        JSONObject obstacleJson = new JSONObject();
+                        obstacleJson.put("position_x", n.getX());
+                        obstacleJson.put("position_y", n.getY());
+
+                        json.append("obstacles", obstacleJson);
+                    }
+
+                    out.println(json.toString());
                 } else if (input.startsWith("goto,")) {
                     String[] parts = input.split(",");
 
@@ -73,7 +86,6 @@ public class Listener {
                     }
 
                 } else if (input.equals("robot")) {
-                    //"[{\"id\": 1, \"name\": \"taikaviitta\", \"direction\": \"east\", \"position_x\": 0, \"position_y\":0}]"
                     // TODO: When we start supporting multiple robot we will need to add instance handling here
                     JSONObject json = new JSONObject();
                     ArrayList<Robot> robotsList = new ArrayList<>();
@@ -96,9 +108,8 @@ public class Listener {
                     out.println("{\"success\": true}");
                 } else if (input.equals("sensor")) {
                     JSONObject json = new JSONObject();
-                    ArrayList<Sensor> sensorsList = this.delegate.getSensors();
 
-                    for (Sensor sensor : sensorsList) {
+                    for (Sensor sensor : this.delegate.getSensors()) {
                         JSONObject singleSensorJson = new JSONObject();
 
                         singleSensorJson.put("id", sensor.getId());

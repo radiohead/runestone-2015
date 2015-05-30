@@ -101,9 +101,7 @@ public class Dispatch implements Runnable {
         ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPathToNodeMatchingRequirements(robot.getCurrentPosition(), job.goods.getRequirements(), this.room);
 
         ArrayList<Command> commands = CommandFactory.commandsFromPath(path, robot.getCurrentDirection());
-        if (this.executeCommands(robot, commands)) {
-            robot.setCurrentPosition(path.get(path.size() - 1));
-        }
+        this.executeCommands(robot, commands);
     }
 
     /**
@@ -117,10 +115,7 @@ public class Dispatch implements Runnable {
         ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPath(robot.getCurrentPosition(), destination, this.room);
         System.out.println("Current position, x: " + robot.getCurrentPosition().getX() + " y: " + robot.getCurrentPosition().getY());
         ArrayList<Command> commands = CommandFactory.commandsFromPath(path, robot.getCurrentDirection());
-
-        if (this.executeCommands(robot, commands)) {
-            robot.setCurrentPosition(destination);
-        }
+        this.executeCommands(robot, commands);
     }
 
     /**

@@ -3,6 +3,7 @@ package se.uu.it.runestone.teamone.robotcontrol;
 import se.uu.it.runestone.teamone.map.Node;
 import se.uu.it.runestone.teamone.map.Room;
 import se.uu.it.runestone.teamone.robotcontrol.command.Command;
+import se.uu.it.runestone.teamone.robotcontrol.command.MoveForward;
 import se.uu.it.runestone.teamone.robotcontrol.command.TurnCommand;
 
 /**
@@ -13,10 +14,8 @@ import se.uu.it.runestone.teamone.robotcontrol.command.TurnCommand;
 public class Robot implements Runnable {
     private int id;
     private String name;
-    private String mac_address;
 
     private Communicator communicator;
-    private Thread communicatorThread;
 
     private Node currentPosition;
     private Room.Direction currentDirection;
@@ -31,35 +30,40 @@ public class Robot implements Runnable {
     public Robot(String name, String mac_address, boolean test) {
         this.id = 0;
         this.name = name;
-        this.mac_address = mac_address;
 
         System.out.println("Robot - Creating communicator.");
 
         if (test) {
-            this.communicator = new TestCommunicator(this.name, this.mac_address);
+            this.communicator = new TestCommunicator(this.name, mac_address);
         }
         else {
-            this.communicator = new Communicator(this.name, this.mac_address);
+            this.communicator = new Communicator(this.name, mac_address);
         }
     }
 
     @Override
     public void run() {
         System.out.println("Robot - Running main loop.");
+
         while (true) {
             Command command = this.getCurrentCommand();
             if (command == null) {
                 try {
                     Thread.sleep(200);
-                } catch (Exception e) { }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             } else {
                 System.out.println("Robot - sending command \"" + command + "\" to robot.");
 
-                // IS: what happens if sendCommand fails?
-                this.communicator.sendCommand(command);
-                if (command instanceof TurnCommand) {
-                    this.setCurrentDirection(((TurnCommand) command).directionAfterExecution(this.getCurrentDirection()));
+                if (this.communicator.sendCommand(command)) {
+                    if (command instanceof TurnCommand) {
+                        this.setCurrentDirection(((TurnCommand) command).directionAfterExecution(this.getCurrentDirection()));
+                    } else {
+                        this.setCurrentPosition(((MoveForward) command).getDestination());
+                    }
                 }
+
                 this.setCurrentCommand(null);
             }
         }

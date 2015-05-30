@@ -74,7 +74,7 @@ public class Server extends Thread implements Runnable, ListenerDelegate {
             System.out.println("Server - Listening for api comms.");
             this.listener.listen();
         } catch (IOException e) {
-            System.out.println("IOException in api listener");
+            e.printStackTrace();
         }
     }
 
@@ -94,6 +94,9 @@ public class Server extends Thread implements Runnable, ListenerDelegate {
         Node node = this.map.nodeFromCoordinates(x, y);
         this.dispatch.setManualMode(node);
     }
+
+    @Override
+    public Room getRoom() { return this.map; }
 
     @Override
     public Robot getRobotInstance(int robotId) {

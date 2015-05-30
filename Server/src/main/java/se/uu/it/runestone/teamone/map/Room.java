@@ -39,17 +39,9 @@ public class Room implements PathFindingGraph {
     private ArrayList<Node> quadrant2;
     private ArrayList<Node> quadrant3;
     private ArrayList<Node> quadrant4;
-    private ArrayList<ArrayList<Node>> quadrant = new ArrayList<ArrayList<Node>>();
+    private ArrayList<ArrayList<Node>> quadrant = new ArrayList<>();
     private int dimX;
 	private int dimY;
-	private int identity;
-
-	public int getIdentity() {
-        return this.identity;
-    }
-    public void setIdentity(int id) {
-        this.identity = id;
-    }
 
     /**
      * Constructor for the Room-class, requires the dimensions
@@ -57,7 +49,7 @@ public class Room implements PathFindingGraph {
      * @param xs Dimension of the room on the x-axis.
      * @param ys Dimension of the room on the y-axis.
      */
-	public Room(int xs, int ys/*, ArrayList<Sensor> sensorList*/){
+	public Room(int xs, int ys){
         final Sensor sensor1 = new Sensor(1,"/dev/tty.HC-06-DevB",new Coordinate(0,0));
         final Sensor sensor2 = new Sensor(2,"/dev/tty.HC-06-DevB-1",new Coordinate(0,this.getDimY()));
         final Sensor sensor3 = new Sensor(3,"/dev/tty.HC-06-DevB-2",new Coordinate(this.getDimX(), this.getDimY()));
@@ -79,7 +71,7 @@ public class Room implements PathFindingGraph {
 
         thread.start();
 
-        sensorList = new ArrayList<Sensor>();
+        sensorList = new ArrayList<>();
         sensorList.add(sensor1);
         sensorList.add(sensor2);
         sensorList.add(sensor3);
@@ -100,9 +92,8 @@ public class Room implements PathFindingGraph {
 		this.dimX=xs;
 		this.dimY=ys;
 
-        //sensorList = new ArrayList<Sensor>();
-        node = new ArrayList<Node>();
-        Node temp = null;
+        node = new ArrayList<>();
+        Node temp;
 		for(int i=0;i<ys;i++){
 			for(int j=0;j<xs;j++){
                 if ((j == 2 && i != this.getDimY() % 8 ) || ( j == 6 && i != this.getDimY()-4) ){
@@ -132,10 +123,10 @@ public class Room implements PathFindingGraph {
         int midx = this.getDimX() % 2;
         int midy = this.getDimY() % 2;
 
-        this.quadrant1 = new ArrayList<Node>();
-        this.quadrant2 = new ArrayList<Node>();
-        this.quadrant3 = new ArrayList<Node>();
-        this.quadrant4 = new ArrayList<Node>();
+        this.quadrant1 = new ArrayList<>();
+        this.quadrant2 = new ArrayList<>();
+        this.quadrant3 = new ArrayList<>();
+        this.quadrant4 = new ArrayList<>();
 
         for(Node n : this.node){
             if(n.getX() <= midx && n.getX() > 0){
@@ -163,11 +154,18 @@ public class Room implements PathFindingGraph {
 	public int getDimX() {
 		return dimX;
 	}
-	public void setX(int newX){
-		this.dimX = newX;
-	}
     public ArrayList<Node> getNode(){return node;}
     public ArrayList<Sensor> getSensorList(){return sensorList;}
+
+    public ArrayList<Node> getObstructedNodes() {
+        ArrayList<Node> result = new ArrayList<>();
+
+        for (Node n : this.node) {
+            if (n.getObstructed())  result.add(n);
+        }
+
+        return result;
+    }
 
     /**
      * Retreive a node with given coordinates x and y.
@@ -184,22 +182,6 @@ public class Room implements PathFindingGraph {
             return node.get(this.getDimY() * y + x);
         } else { return null; }
     }
-
-    /*@Override
-	public ArrayList<PathFindingNode> neighbours(PathFindingNode node) {
-		// TODO Auto-generated method stub
-		int index = this.node.indexOf(node);
-		Node left = this.node.get(index-1);
-		Node right= this.node.get(index+1);
-		Node top = this.node.get(index - dimX);
-		Node bottom = this.node.get(index + dimX);
-		ArrayList<PathFindingNode> result = new ArrayList<PathFindingNode>();
-		result.add(top);
-		result.add(left);
-		result.add(bottom);
-		result.add(right);
-		return result;
-	}*/
 
 	/**
 	 * Returns the navigational direction in the warehouse when

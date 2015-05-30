@@ -1,6 +1,7 @@
 package se.uu.it.runestone.teamone.socket;
 
 import se.uu.it.runestone.teamone.climate.Sensor;
+import se.uu.it.runestone.teamone.map.Room;
 import se.uu.it.runestone.teamone.robotcontrol.Robot;
 
 import java.util.ArrayList;
@@ -38,4 +39,6 @@ public interface ListenerDelegate {
     Robot getRobotInstance(int robotId);
 
     ArrayList<Sensor> getSensors();
+
+    Room getRoom();
 }
