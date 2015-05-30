@@ -13,21 +13,6 @@ import java.util.ArrayList;
  * @author Åke Lagercrantz
  */
 public interface ListenerDelegate {
-
-    /**
-     * Returns the width of the warehouse.
-     *
-     * @return The width of the warehosue.
-     */
-    Integer warehouseWidth();
-
-    /**
-     * Returns the height of the warehouse.
-     *
-     * @return The height of the warehouse.
-     */
-    Integer warehouseHeight();
-
     /**
      * Manual navigation of robot to x,y coordinate.
      *

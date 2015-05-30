@@ -78,17 +78,6 @@ public class Server extends Thread implements Runnable, ListenerDelegate {
         }
     }
 
-    // Listener delegate
-    @Override
-    public Integer warehouseHeight() {
-        return this.map.getDimY();
-    }
-
-    @Override
-    public Integer warehouseWidth() {
-        return this.map.getDimX();
-    }
-
     @Override
     public void goTo(Integer x, Integer y) {
         Node node = this.map.nodeFromCoordinates(x, y);
