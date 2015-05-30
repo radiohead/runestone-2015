@@ -103,6 +103,13 @@ block content
       }
     }
 
+    if (map_data.obstacles) {
+      for (var i in map_data.obstacles) {
+        $('#maptd_' + map_data.obstacles[i].position_y + '_' + map_data.obstacles[i].position_x).css('background-color','pink');
+        console.log($('#maptd_' + map_data.obstacles[i].position_y + '_' + map_data.obstacles[i].position_x));
+      }
+    }
+
     put_sensors();
 
     $('#maptd_' + robots[0].y + '_' + robots[0].x).html('<div id="robot_1" class="robot left_right" data-robot="1"></div>');
