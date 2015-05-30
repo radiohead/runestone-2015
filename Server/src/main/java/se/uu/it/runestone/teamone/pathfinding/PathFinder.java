@@ -1,5 +1,6 @@
 package se.uu.it.runestone.teamone.pathfinding;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
@@ -162,6 +163,8 @@ public class PathFinder {
       current = links.get(current);
       path.add(current);
     }
+
+    Collections.reverse(path);
 
     return path;
   }

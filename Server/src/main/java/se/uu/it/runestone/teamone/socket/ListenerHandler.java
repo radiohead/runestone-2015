@@ -90,6 +90,7 @@ public class ListenerHandler extends Thread {
 
                     out.println(json.toString());
                 } else if (input.equals("release")) {
+                    this.delegate.getDispatcher().releaseManualMode();
                     out.println("{\"success\": true}");
                 } else if (input.equals("sensor")) {
                     JSONObject json = new JSONObject();

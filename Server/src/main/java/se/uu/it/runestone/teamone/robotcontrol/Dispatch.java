@@ -45,7 +45,7 @@ public class Dispatch implements Runnable {
         this.scheduler = scheduler;
         this.robot = robot;
 
-        this.executing = false;;
+        this.executing = false;
         this.abortCurrentJob = false;
         this.manualMode = false;
         this.manualDestination = null;
@@ -88,6 +88,11 @@ public class Dispatch implements Runnable {
         this.abortCurrentJob = true;
     }
 
+    public void releaseManualMode() {
+        System.out.println("Dispatch - Releasing manual mode.");
+        this.manualMode = false;
+    }
+
     /**
      * Dispatches a robot on a job. Will remain in charge of the robot
      * until the job is done, when the robot is returned. No other
@@ -99,9 +104,8 @@ public class Dispatch implements Runnable {
     private void dispatch(Robot robot, Job job) {
         @SuppressWarnings({"unchecked"}) // We know the return type will be ArrayList<Node> since we supply the nodes ourselves.
         ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPathToNodeMatchingRequirements(robot.getCurrentPosition(), job.goods.getRequirements(), this.room);
-
         ArrayList<Command> commands = CommandFactory.commandsFromPath(path, robot.getCurrentDirection());
-        this.executeCommands(robot, commands);
+        this.executeCommands(commands);
     }
 
     /**
@@ -113,9 +117,9 @@ public class Dispatch implements Runnable {
     private void dispatch(Robot robot, Node destination) {
         @SuppressWarnings({"unchecked"}) // We know the return type will be ArrayList<Node> since we supply the nodes ourselves.
         ArrayList<Node> path = (ArrayList<Node>) this.pathFinder.shortestPath(robot.getCurrentPosition(), destination, this.room);
-        System.out.println("Current position, x: " + robot.getCurrentPosition().getX() + " y: " + robot.getCurrentPosition().getY());
         ArrayList<Command> commands = CommandFactory.commandsFromPath(path, robot.getCurrentDirection());
-        this.executeCommands(robot, commands);
+        this.executeCommands(commands);
+        System.out.println(String.format("Robot is in: %s, %s", this.robot.getCurrentPosition().getX(), this.robot.getCurrentPosition().getY()));
     }
 
     /**
@@ -123,12 +127,11 @@ public class Dispatch implements Runnable {
      *
      * Note: Blocking.
      *
-     * @param robot     The robot to execute on.
      * @param commands  The commands to execute.
      *
      * @return Whether the commands were executed successfully.
      */
-    private Boolean executeCommands(Robot robot, ArrayList<Command> commands) {
+    private Boolean executeCommands(ArrayList<Command> commands) {
         if (this.executing) {
             System.out.println("Dispatch - Already executing. Not taking on new commands.");
             return false;
@@ -139,26 +142,20 @@ public class Dispatch implements Runnable {
 
         System.out.println("Dispatch - Preparing to execute " + commands.size() + " commands.");
 
-        for (int i = 0; i < commands.size(); i++) {
-            if (this.abortCurrentJob) {
-                System.out.println("Dispatch - aborting current job.");
-                this.abortCurrentJob = false;
-                this.executing = false;
-                return false;
-            }
+        if (this.abortCurrentJob) {
+            System.out.println("Dispatch - aborting current job.");
+            this.abortCurrentJob = false;
+            this.executing = false;
+            return false;
+        }
 
-            Command command = commands.remove(0);
-
-            while (true) {
-                if (this.robot.setCurrentCommand(command)) {
-                    System.out.println("Dispatch - Executing command \"" + command.toString() + "\"");
-                    break;
-                } else {
-                    try {
-                        Thread.sleep(200);
-                    } catch (Exception e) { }
-                }
+        for (Command command : commands) {
+            boolean executed = this.robot.setCurrentCommand(command);
+            while(!executed) {
+                executed = this.robot.setCurrentCommand(command);
             }
+            while(this.robot.getCurrentCommand() != null);
+            System.out.print("Dispatch - Executed command " + command.toString());
         }
 
         this.executing = false;
@@ -167,5 +164,4 @@ public class Dispatch implements Runnable {
 
         return true;
     }
-
 }

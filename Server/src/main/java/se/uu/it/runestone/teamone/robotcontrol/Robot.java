@@ -54,7 +54,7 @@ public class Robot implements Runnable {
                     e.printStackTrace();
                 }
             } else {
-                System.out.println("Robot - sending command \"" + command + "\" to robot.");
+                System.out.print("Robot - sending command - " + command);
 
                 if (this.communicator.sendCommand(command)) {
                     if (command instanceof TurnCommand) {
