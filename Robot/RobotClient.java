@@ -124,7 +124,7 @@ public class RobotClient {
 
     private void sendResponse(String message) throws Exception {
       try {
-        this.serverOutput.writeChars(message + "\n");
+        this.serverOutput.writeBytes(message + "\n");
         this.serverOutput.flush();
       }
       catch (IOException e) {

@@ -2,6 +2,7 @@ package se.uu.it.runestone.teamone.robotcontrol;
 
 import lejos.pc.comm.NXTConnector;
 import lejos.pc.comm.NXTCommFactory;
+import org.apache.commons.io.IOUtils;
 import java.io.*;
 
 import se.uu.it.runestone.teamone.robotcontrol.command.Command;
@@ -39,7 +40,7 @@ public class Communicator {
         System.out.println("Connecting to " + this.brickAddress);
         while (!connected) {
             connected = this.brickConnection.connectTo(this.brickName, this.brickAddress, NXTCommFactory.BLUETOOTH);
-//            System.out.println("Connection to robot: " + connected);
+           System.out.println("Connection to robot: " + connected);
         }
 
         this.inputFromBrick = brickConnection.getInputStream();
@@ -65,8 +66,8 @@ public class Communicator {
             outputToBrick.flush();
             inputFromBrick.read(buffer);
 
-            response = new String(buffer);
-            return (response == "success");
+            response = new String(buffer, "UTF-8").split("\n")[0];
+            return response.contains("success");
         }
         catch (IOException e) {
             System.out.println("Failed to communicate with the robot, re-connecting!");
