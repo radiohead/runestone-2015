@@ -10,10 +10,10 @@ block content
             tr(id='maptr'+n)
             - var m = 0
             while m < map.size_y
-              td(id='maptd_'+n+'_'+m, data-x = m, data-y = n)
+              td(id='maptd_'+n+'_'+m, data-x = m, data-y = n, class='maptd')
               - m++
             - n++
-      td
+      td(style='vertical-align: top')
         table
           tr
             td
@@ -80,6 +80,8 @@ block content
                     label(for='input_pack_size') Package size
                     input.form-control#input_pack_size
                   a.btn.btn-success.sendrobotdata Go
+      td(style='vertical-align: top')
+        div.alert.alert-info.showalert
 
   div.hiddensensordata(style='display: none;')
     #{data}
@@ -87,7 +89,7 @@ block content
     #{JSON.stringify(map)}
 
   script.
-    var refresh_rate = 100;
+    var refresh_rate = 1000;
     var controls = $('.controlsdiv');
 
     var data = JSON.parse($('.hiddensensordata').text().substring(1, $('.hiddensensordata').text().length - 1));
@@ -105,21 +107,19 @@ block content
 
     if (map_data.obstacles) {
       for (var i in map_data.obstacles) {
-        $('#maptd_' + map_data.obstacles[i].position_y + '_' + map_data.obstacles[i].position_x).css('background-color','pink');
-        console.log($('#maptd_' + map_data.obstacles[i].position_y + '_' + map_data.obstacles[i].position_x));
+        $('#maptd_' + map_data.obstacles[i].position_y + '_' + map_data.obstacles[i].position_x).addClass('obstacle');
       }
     }
 
     put_sensors();
+    $('.showalert').hide();
 
-    $('#maptd_' + robots[0].y + '_' + robots[0].x).html('<div id="robot_1" class="robot left_right" data-robot="1"></div>');
+    $('#maptd_' + robots[0].y + '_' + robots[0].x).html('<div id="robot_1" class="robot left_right" data-robot="1"><span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span></div>');
     $('.stopmanual').hide();
 
-    $('.map').on('click', '.robot', function(){
-      controls.attr('data-robot', $(this).attr('data-robot'));
-      $(this).addClass('selected');
-      $('.startmanual').removeClass('disabled');
-      controls.show();
+    $('.maptd').on('click', function() {
+      $('#input_x').val($(this).data('x'));
+      $('#input_y').val($(this).data('y'));
     });
 
     $('.manualrobot').on('click', function() {
@@ -135,7 +135,8 @@ block content
       };
 
       if (x < 0 || y < 0 || x > map_data.size_x - 1 || y > map_data.size_y - 1) {
-        alert('Incorrect coordinates, x range is {0,' + (map_data.size_x - 1) + '}, y range is {0,' + (map_data.size_y - 1) + '}');
+        $('.showalert').show();
+        $('.showalert').html('Incorrect coordinates, x range is {0,' + (map_data.size_x - 1) + '}, y range is {0,' + (map_data.size_y - 1) + '}');
       } else {
         var check_obstacles = true;
         for (var i in map_data.obstacles) {
@@ -151,16 +152,20 @@ block content
             dataType: 'json',
             data: new_robot_data,
             complete: function() {
-              console.log(arguments);
+              //- console.log(arguments);
             },
             success: function(data, textStatus, jqXHR) {console.log('ASDA')
               if (data.complete) {
-                alert('Robot is on his way to ' + JSON.stringify(new_robot_data));
+                $('.showalert').show();
+                $('.showalert').attr('class', 'showalert alert alert-success');
+                $('.showalert').html('Robot is on his way to ' + JSON.stringify(new_robot_data));
               }
             }
           });
         } else {
-          alert('There is an obstacle in ' + JSON.stringify(new_robot_data));
+          $('.showalert').show();
+          $('.showalert').attr('class', 'showalert alert alert-danger');
+          $('.showalert').html('There is an obstacle in ' + JSON.stringify(new_robot_data));
         }
       }
 
@@ -173,7 +178,9 @@ block content
         url: '/robot/release',
         success: function(data, textStatus, jqXHR) {
           if (data.complete) {
-            alert('Robot is in auto mode');
+            $('.showalert').show();
+            $('.showalert').attr('class', 'showalert alert alert-success');
+            $('.showalert').html('Robot is in auto mode');
           }
         }
       });
@@ -334,7 +341,9 @@ block content
         data: new_robot_data,
         success: function(data, textStatus, jqXHR) {
           if (data.complete) {
-            alert('Robot is scheduled with params ' + JSON.stringify(new_robot_data));
+            $('.showalert').show();
+            $('.showalert').attr('class', 'showalert alert alert-success');
+            $('.showalert').html('Robot is scheduled with params ' + JSON.stringify(new_robot_data));
           }
         }
       });
@@ -358,6 +367,7 @@ block content
               robot.addClass('up_down');
               robot.removeClass('left_right');
             }
+            robot.children('.glyphicon').attr('class', 'glyphicon glyphicon-arrow-' + robot_data.rotated);
 
             $('#maptd_' + robot_data.y + '_' + robot_data.x).html(robot);
 
