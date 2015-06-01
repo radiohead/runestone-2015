@@ -2,7 +2,6 @@ package se.uu.it.runestone.teamone.robotcontrol;
 
 import lejos.pc.comm.NXTConnector;
 import lejos.pc.comm.NXTCommFactory;
-import org.apache.commons.io.IOUtils;
 import java.io.*;
 
 import se.uu.it.runestone.teamone.robotcontrol.command.Command;
